@@ -4,7 +4,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "@/stores/user";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
-import NotFoundView from "../views/NotFoundView.vue";
 import SettingView from "../views/SettingView.vue";
 
 const router = createRouter({
@@ -12,11 +11,26 @@ const router = createRouter({
   routes: [
     {
       path: "/",
+      redirect: { name: "Catalog" },
       name: "Home",
       component: HomeView,
+      meta: { requiresAuth: true },
+      children: [],
     },
     {
-      path: "/setting",
+      path: "/catalog",
+      name: "Catalog",
+      component: HomeView, // TODO: change to catalog view
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/profile",
+      name: "Profile",
+      component: SettingView, // TODO: change to profile view
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/profile/settings",
       name: "Settings",
       component: SettingView,
       meta: { requiresAuth: true },
@@ -29,14 +43,15 @@ const router = createRouter({
       beforeEnter: (to, from) => {
         const { isLoggedIn } = storeToRefs(useUserStore());
         if (isLoggedIn.value) {
-          return { name: "Settings" };
+          return { name: "Profile" };
         }
       },
     },
     {
-      path: "/:catchAll(.*)",
-      name: "not-found",
-      component: NotFoundView,
+      path: "/tasks",
+      name: "Tasks",
+      component: HomeView, // TODO: change to tasks view
+      meta: { requiresAuth: true },
     },
   ],
 });
