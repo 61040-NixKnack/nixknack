@@ -5,7 +5,7 @@ import { useUserStore } from "@/stores/user";
 import HomeView from "../views/HomeView.vue";
 import ItemView from "../views/ItemView.vue";
 import LoginView from "../views/LoginView.vue";
-import NotFoundView from "../views/NotFoundView.v ue";
+import NotFoundView from "../views/NotFoundView.vue";
 import SettingView from "../views/SettingView.vue";
 
 const router = createRouter({
