@@ -3,7 +3,9 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
 import HomeView from "../views/HomeView.vue";
+import ItemView from "../views/ItemView.vue";
 import LoginView from "../views/LoginView.vue";
+import NotFoundView from "../views/NotFoundView.v ue";
 import SettingView from "../views/SettingView.vue";
 
 const router = createRouter({
@@ -52,6 +54,17 @@ const router = createRouter({
       name: "Tasks",
       component: HomeView, // TODO: change to tasks view
       meta: { requiresAuth: true },
+    },
+    {
+      path: "/catalog/item/:id",
+      name: "Item",
+      component: ItemView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/:catchAll(.*)",
+      name: "not-found",
+      component: NotFoundView,
     },
   ],
 });
