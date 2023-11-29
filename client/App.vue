@@ -22,74 +22,104 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <header>
-    <nav>
-      <div class="title">
-        <img src="@/assets/images/logo.svg" />
-        <RouterLink :to="{ name: 'Home' }">
-          <h1>Social Media App</h1>
-        </RouterLink>
+  <article v-if="toast !== null" class="toast" :class="toast.style">
+    <p>{{ toast.message }}</p>
+  </article>
+  <RouterView class="content" />
+  <nav v-show="currentRouteName != 'Login'">
+    <RouterLink :to="{ name: 'Catalog' }">
+      <div id="home-button" class="nav-target" :class="{ active_target: currentRouteName == 'Catalog' }">
+        <div class="target_overlay">
+          <div class="material-symbols-outlined nav-target-icon">grid_view</div>
+        </div>
       </div>
-      <ul>
-        <li>
-          <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Home </RouterLink>
-        </li>
-        <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
-        </li>
-        <li v-else>
-          <RouterLink :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
-        </li>
-      </ul>
-    </nav>
-    <article v-if="toast !== null" class="toast" :class="toast.style">
-      <p>{{ toast.message }}</p>
-    </article>
-  </header>
-  <RouterView />
+    </RouterLink>
+    <RouterLink :to="{ name: 'Profile' }">
+      <div id="music-player-button" class="nav-target" :class="{ active_target: currentRouteName == 'Profile' }">
+        <div class="target_overlay">
+          <div class="material-symbols-outlined nav-target-icon">account_circle</div>
+        </div>
+      </div>
+    </RouterLink>
+    <RouterLink :to="{ name: 'Tasks' }">
+      <div id="messages-button" class="nav-target" :class="{ active_target: currentRouteName == 'Tasks' }">
+        <div class="target_overlay">
+          <div class="material-symbols-outlined nav-target-icon">assignment</div>
+        </div>
+      </div>
+    </RouterLink>
+  </nav>
 </template>
 
 <style scoped>
 @import "./assets/toast.css";
 
+.content {
+  margin-bottom: 80px;
+  /* background-color: var(--primary); */
+}
+
 nav {
-  padding: 1em 2em;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-around;
+
   background-color: lightgray;
   display: flex;
-  align-items: center;
+
+  position: fixed;
+  bottom: 0;
+  min-height: 52px;
+  width: 100%;
+  padding-top: 12px;
+  padding-bottom: 16px;
+  gap: 8px;
+
+  background-color: var(--light-accent);
 }
 
-h1 {
-  font-size: 2em;
-  margin: 0;
+.nav-target-icon {
+  width: 24px;
+  height: 24px;
+  line-height: 32px;
+  color: var(--on-primary);
 }
 
-.title {
+.nav-target:hover {
+  cursor: pointer;
+}
+
+.target_overlay {
+  width: 64px;
+  height: 32px;
   display: flex;
-  align-items: center;
-  gap: 0.5em;
+  justify-content: center;
+  align-content: center;
+  background-color: rgba(0, 0, 0, 0);
+  border-radius: 16px;
 }
 
-img {
-  height: 2em;
+.target_overlay:hover {
+  background-color: rgba(0, 0, 0, 0.175);
+}
+
+.active_target {
+  .target_overlay {
+    background-color: var(--dark-accent);
+  }
+
+  .nav-target-icon {
+    color: var(--on-primary);
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: "FILL" 1;
+  }
 }
 
 a {
-  font-size: large;
+  font-size: small;
   color: black;
   text-decoration: none;
-}
-
-ul {
-  list-style-type: none;
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  gap: 1em;
-}
-
-.underline {
-  text-decoration: underline;
 }
 </style>
