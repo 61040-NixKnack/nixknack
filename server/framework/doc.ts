@@ -116,6 +116,22 @@ export default class DocCollection<Schema extends BaseDoc> {
   }
 
   /**
+   * Update an array field of a document that matches `filter` based on options.
+   */
+  async updateArrayOne(filter: Filter<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
+    this.sanitizeFilter(filter);
+    return await this.collection.updateOne(filter, options);
+  }
+
+  /**
+   * Update an array field of documents that matches `filter` based on options.
+   */
+  async updateArrayMany(filter: Filter<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
+    this.sanitizeFilter(filter);
+    return await this.collection.updateMany(filter, options);
+  }
+
+  /**
    * Delete the document that matches `filter`.
    */
   async deleteOne(filter: Filter<Schema>, options?: DeleteOptions): Promise<DeleteResult> {

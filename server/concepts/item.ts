@@ -28,6 +28,11 @@ export default class ItemConcept {
     return items;
   }
 
+  async getItem(_id: ObjectId) {
+    await this.itemExists(_id);
+    return await this.items.readOne({ _id });
+  }
+
   async update(_id: ObjectId, update: Partial<ItemDoc>) {
     await this.itemExists(_id);
     await this.items.updateOne({ _id }, update);

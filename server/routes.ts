@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Item, User, WebSession } from "./app";
+import { Item, Tag, User, WebSession } from "./app";
 import { ItemDoc } from "./concepts/item";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -56,10 +56,18 @@ class Routes {
   }
 
   @Router.get("/items")
-  async getItems(user: string) {
-    const id = (await User.getUserByUsername(user))._id;
-    const items = await Item.getItems({ user: id });
-    return items; // # To Do: Fix Responses, what type of information does front end want?
+  async getItems(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const items = await Item.getItems({ owner: user });
+    return items.map((item) => ({ ...item, name: item.name, id: item._id }));
+  }
+
+  @Router.get("/items/:_id")
+  async getItem(_id: ObjectId) {
+    const id = new ObjectId(_id);
+    const item = await Item.getItem(id);
+    const tags = await Tag.getTags(id);
+    return { owner: item?.owner, name: item?.name, lastUsedDate: item?.lastUsedDate, location: item?.location, purpose: item?.purpose, tags: tags };
   }
 
   @Router.post("/items")
@@ -71,17 +79,25 @@ class Routes {
 
   @Router.patch("/items/:_id")
   async updateItem(session: WebSessionDoc, _id: ObjectId, update: Partial<ItemDoc>) {
+    const id = new ObjectId(_id);
     const user = WebSession.getUser(session);
-    await Item.isOwner(user, _id);
-    return await Item.update(_id, update);
+    await Item.isOwner(user, id);
+    return await Item.update(id, update);
   }
 
   @Router.delete("/items/:_id")
   async deleteItem(session: WebSessionDoc, _id: ObjectId) {
+    const id = new ObjectId(_id);
     const user = WebSession.getUser(session);
-    await Item.isOwner(user, _id);
-    return Item.delete(_id);
+    await Item.isOwner(user, id);
+    return Item.delete(id);
   }
+
+  @Router.post("/items/:_id/:tag")
+  async addItemToTag(session: WebSessionDoc, tag: string, _id: ObjectId) {}
+
+  @Router.delete("/items/:_id/:tag")
+  async removeItemFromTag(session: WebSessionDoc, tag: string, _id: ObjectId) {}
 }
 
 export default getExpressRouter(new Routes());
