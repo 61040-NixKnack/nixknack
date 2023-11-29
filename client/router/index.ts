@@ -5,6 +5,7 @@ import { useUserStore } from "@/stores/user";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
+import ItemView from "../views/ItemView.vue";
 import SettingView from "../views/SettingView.vue";
 
 const router = createRouter({
@@ -32,6 +33,12 @@ const router = createRouter({
           return { name: "Settings" };
         }
       },
+    },
+    {
+      path: "/catalog/item/:id",
+      name: "Item",
+      component: ItemView,
+      meta: { requiresAuth: true },
     },
     {
       path: "/:catchAll(.*)",
