@@ -11,6 +11,8 @@ import {
   FindOptions,
   ObjectId,
   OptionalUnlessRequiredId,
+  PullOperator,
+  PushOperator,
   ReplaceOptions,
   UpdateResult,
   WithId,
@@ -116,19 +118,35 @@ export default class DocCollection<Schema extends BaseDoc> {
   }
 
   /**
-   * Update an array field of a document that matches `filter` based on options.
+   * Add to an array field of a document that matches `filter` based on options.
    */
-  async updateArrayOne(filter: Filter<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
+  async pushArrayOne(filter: Filter<Schema>, update: PushOperator<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
     this.sanitizeFilter(filter);
-    return await this.collection.updateOne(filter, options);
+    return await this.collection.updateOne(filter, { $push: update }, options);
   }
 
   /**
-   * Update an array field of documents that matches `filter` based on options.
+   * Add to an array field of documents that matches `filter` based on options.
    */
-  async updateArrayMany(filter: Filter<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
+  async pushArrayMany(filter: Filter<Schema>, update: PushOperator<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
     this.sanitizeFilter(filter);
-    return await this.collection.updateMany(filter, options);
+    return await this.collection.updateMany(filter, { $push: update }, options);
+  }
+
+  /**
+   * Remove from an array field of a document that matches `filter` based on options.
+   */
+  async removeArrayOne(filter: Filter<Schema>, update: PullOperator<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
+    this.sanitizeFilter(filter);
+    return await this.collection.updateOne(filter, { $pull: update }, options);
+  }
+
+  /**
+   * Remove from an array field of documents that matches `filter` based on options.
+   */
+  async removeArrayMany(filter: Filter<Schema>, update: PullOperator<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
+    this.sanitizeFilter(filter);
+    return await this.collection.updateMany(filter, { $pull: update }, options);
   }
 
   /**

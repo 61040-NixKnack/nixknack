@@ -25,23 +25,24 @@ export default class TagConcept {
 
   async addItem(tag: string, itemId: ObjectId) {
     await this.itemNotAdded(tag, itemId);
-    await this.tags.updateArrayOne({ value: tag }, { $push: { taggedItems: itemId } });
+    await this.tags.pushArrayOne({ value: tag }, { taggedItems: itemId });
     return { msg: `Item ${itemId} added for tag ${tag}!` };
   }
 
   async deleteItem(tag: string, itemId: ObjectId) {
     await this.itemAdded(tag, itemId);
-    await this.tags.updateArrayOne({ value: tag }, { $pull: { taggedItems: itemId } });
+    await this.tags.removeArrayOne({ value: tag }, { taggedItems: itemId });
     return { msg: `Item ${itemId} deleted for tag ${tag}!` };
   }
 
   async addItemToTags(tags: string[], itemId: ObjectId) {
-    await this.tags.updateArrayMany({ value: { $in: tags } }, { $push: { taggedItems: itemId } });
+    await this.tags.pushArrayMany({ value: { $in: tags } }, { taggedItems: itemId });
     return { msg: `Item ${itemId} successfully added to tags` };
   }
 
   async deleteItemFromAll(itemId: ObjectId) {
-    await this.tags.updateArrayMany({}, { $pull: { taggedItems: itemId } });
+    await this.tags.removeArrayMany({}, { taggedItems: itemId });
+    return { msg: `Item ${itemId} successfully removed from all tags` };
   }
 
   async getTags(itemId: ObjectId) {

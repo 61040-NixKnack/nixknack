@@ -55,6 +55,10 @@ class Routes {
     return { msg: "Logged out!" };
   }
 
+  /**
+   * @param session current Web Session
+   * @returns A list of items with only the name and id of the item.
+   */
   @Router.get("/items")
   async getItems(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
@@ -62,6 +66,10 @@ class Routes {
     return items.map((item) => ({ ...item, name: item.name, id: item._id }));
   }
 
+  /**
+   * @param _id Item ID
+   * @returns the item ItemDoc and the tags for given item ID
+   */
   @Router.get("/items/:_id")
   async getItem(_id: ObjectId) {
     const id = new ObjectId(_id);
@@ -90,7 +98,7 @@ class Routes {
     const id = new ObjectId(_id);
     const user = WebSession.getUser(session);
     await Item.isOwner(user, id);
-    await Tag.deleteItemFromAll(id);
+    await Tag.deleteItemFromAll(id); // Delete item from all tags.
     return Item.delete(id);
   }
 
@@ -111,7 +119,7 @@ class Routes {
   }
 
   @Router.get("/items/:_id/tags")
-  async getTagsForItem(session: WebSessionDoc, _id: ObjectId) {
+  async getTagsForItem(_id: ObjectId) {
     const id = new ObjectId(_id);
     return await Tag.getTags(id);
   }
