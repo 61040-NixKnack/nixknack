@@ -123,6 +123,18 @@ class Routes {
     const id = new ObjectId(_id);
     return await Tag.getTags(id);
   }
+
+  /**
+   * @param session current Web Session
+   * @param tag string
+   * @returns number of items the user has for a given tag
+   */
+  @Router.get("/items/:tag")
+  async getTagItemCount(session: WebSessionDoc, tag: string) {
+    const user = WebSession.getUser(session);
+    const items = await Tag.getItems(tag);
+    return await Item.getItemCount(user, items);
+  }
 }
 
 export default getExpressRouter(new Routes());

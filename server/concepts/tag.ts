@@ -50,6 +50,14 @@ export default class TagConcept {
     return tagsFound.map((tag) => tag.value);
   }
 
+  async getItems(tag: string) {
+    const docs = await this.tags.readOne({ value: tag });
+    if (docs) {
+      return docs.taggedItems;
+    }
+    return [];
+  }
+
   private async uniqueTag(tag: string) {
     const maybeItem = await this.tags.readOne({ value: tag });
     if (maybeItem) {

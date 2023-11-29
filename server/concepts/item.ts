@@ -57,6 +57,15 @@ export default class ItemConcept {
       throw new ItemOwnerNotMatchError(owner, _id);
     }
   }
+
+  /**
+   * @param owner owner of the item
+   * @param items list of items
+   * @returns number of items in `items` that is owner by `owner`
+   */
+  async getItemCount(owner: ObjectId, items: ObjectId[]) {
+    return await this.items.count({ owner: owner, _id: { $in: items } });
+  }
 }
 
 export class ItemOwnerNotMatchError extends NotAllowedError {
