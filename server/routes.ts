@@ -1,7 +1,8 @@
-
+import { ObjectId } from "mongodb";
 import { Router, getExpressRouter } from "./framework/router";
 
 import { Item, User, WebSession } from "./app";
+import { ItemDoc } from "./concepts/item";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 
@@ -57,31 +58,30 @@ class Routes {
   @Router.get("/items")
   async getItems(user: string) {
     const id = (await User.getUserByUsername(user))._id;
-    const items = await Item.getItems({user: id});
+    const items = await Item.getItems({ user: id });
     return items; // # To Do: Fix Responses, what type of information does front end want?
   }
 
-  // @Router.post("/items")
-  // async createItem(session: WebSessionDoc, name: string, options?: ItemOptions) {
-  //   const user = WebSession.getUser(session);
-  //   const created = await Post.create(user, content, options);
-  //   return { msg: created.msg, post: await Responses.post(created.post) };
-  // }
+  @Router.post("/items")
+  async createItem(session: WebSessionDoc, name: string, lastUsedDate?: Date, location?: string, purpose?: string) {
+    const user = WebSession.getUser(session);
+    const created = await Item.create(user, name, lastUsedDate, location, purpose);
+    return { msg: created.msg };
+  }
 
-  // @Router.patch("/posts/:_id")
-  // async updateItem(session: WebSessionDoc, _id: ObjectId, update: Partial<PostDoc>) {
-  //   const user = WebSession.getUser(session);
-  //   await Post.isAuthor(user, _id);
-  //   return await Post.update(_id, update);
-  // }
+  @Router.patch("/items/:_id")
+  async updateItem(session: WebSessionDoc, _id: ObjectId, update: Partial<ItemDoc>) {
+    const user = WebSession.getUser(session);
+    await Item.isOwner(user, _id);
+    return await Item.update(_id, update);
+  }
 
-  // @Router.delete("/posts/:_id")
-  // async deleteItem(session: WebSessionDoc, _id: ObjectId) {
-  //   const user = WebSession.getUser(session);
-  //   await Post.isAuthor(user, _id);
-  //   return Post.delete(_id);
-  // }
-
+  @Router.delete("/items/:_id")
+  async deleteItem(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    await Item.isOwner(user, _id);
+    return Item.delete(_id);
+  }
 }
 
 export default getExpressRouter(new Routes());

@@ -3,29 +3,32 @@ import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotAllowedError, NotFoundError } from "./errors";
 
 export interface ItemDoc extends BaseDoc {
-    name: String,
-    location: String, //TO DO
-    purpose: String,
-    lastUsedDate: Date,
-    user: ObjectId
+  owner: ObjectId;
+  name: string;
+  lastUsedDate: Date;
+  location: string;
+  purpose: string;
 }
 
 export default class ItemConcept {
   public readonly items = new DocCollection<ItemDoc>("items");
 
-  async create(user: ObjectId, name: String, location: String, purpose: String, lastUsedDate: Date){
-    await this.isItemUnique(user, name)
-    await this.items.createOne({name, location, purpose, lastUsedDate, user});
+  async create(owner: ObjectId, name: string, lastUsedDate?: Date, location?: string, purpose?: string) {
+    if (!lastUsedDate) {
+      lastUsedDate = new Date();
+    }
+    const id = await this.items.createOne({ owner, name, lastUsedDate, location, purpose });
+    return { msg: "Item created successfully!", id: id };
   }
 
   async getItems(query: Filter<ItemDoc>) {
-    const posts = await this.items.readMany(query, {
-        sort: { lastUsedDate: -1 },
-      });
-      return posts;
+    const items = await this.items.readMany(query, {
+      sort: { lastUsedDate: -1 },
+    });
+    return items;
   }
 
-  async updateItem(_id: ObjectId, update: Partial<ItemDoc>) {
+  async update(_id: ObjectId, update: Partial<ItemDoc>) {
     await this.itemExists(_id);
     await this.items.updateOne({ _id }, update);
     return { msg: "Item updated successfully!" };
@@ -43,9 +46,19 @@ export default class ItemConcept {
     }
   }
 
-  private async isItemUnique(user: ObjectId, name: String) {
-    if (await this.items.readOne({ user: user, name: name })) {
-      throw new NotAllowedError(`Item with name ${name} already exists for user with ID ${user}!`);
+  async isOwner(owner: ObjectId, _id: ObjectId) {
+    const maybeItem = await this.items.readOne({ owner, _id });
+    if (maybeItem === null) {
+      throw new ItemOwnerNotMatchError(owner, _id);
     }
+  }
+}
+
+export class ItemOwnerNotMatchError extends NotAllowedError {
+  constructor(
+    public readonly owner: ObjectId,
+    public readonly _id: ObjectId,
+  ) {
+    super("{0} is not the owner of item {1}!", owner, _id);
   }
 }
