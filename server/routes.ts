@@ -90,14 +90,31 @@ class Routes {
     const id = new ObjectId(_id);
     const user = WebSession.getUser(session);
     await Item.isOwner(user, id);
+    await Tag.deleteItemFromAll(id);
     return Item.delete(id);
   }
 
-  @Router.post("/items/:_id/:tag")
-  async addItemToTag(session: WebSessionDoc, tag: string, _id: ObjectId) {}
+  @Router.post("/items/:_id/:tags")
+  async addItemToTags(session: WebSessionDoc, tags: string[], _id: ObjectId) {
+    const id = new ObjectId(_id);
+    const user = WebSession.getUser(session);
+    await Item.isOwner(user, id);
+    return await Tag.addItemToTags(tags, id);
+  }
 
   @Router.delete("/items/:_id/:tag")
-  async removeItemFromTag(session: WebSessionDoc, tag: string, _id: ObjectId) {}
+  async removeItemFromTag(session: WebSessionDoc, tag: string, _id: ObjectId) {
+    const id = new ObjectId(_id);
+    const user = WebSession.getUser(session);
+    await Item.isOwner(user, id);
+    return await Tag.deleteItem(tag, id);
+  }
+
+  @Router.get("/items/:_id/tags")
+  async getTagsForItem(session: WebSessionDoc, _id: ObjectId) {
+    const id = new ObjectId(_id);
+    return await Tag.getTags(id);
+  }
 }
 
 export default getExpressRouter(new Routes());

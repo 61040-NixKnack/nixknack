@@ -17,6 +17,12 @@ export default class TagConcept {
     return { msg: `Tag ${tag} created successfully!` };
   }
 
+  async getTagTN(tag: string) {
+    await this.tagExists(tag);
+    const tagDoc = await this.tags.readOne({ value: tag });
+    return tagDoc?.thresholdNumber;
+  }
+
   async addItem(tag: string, itemId: ObjectId) {
     await this.itemNotAdded(tag, itemId);
     await this.tags.updateArrayOne({ value: tag }, { $push: { taggedItems: itemId } });
@@ -31,6 +37,7 @@ export default class TagConcept {
 
   async addItemToTags(tags: string[], itemId: ObjectId) {
     await this.tags.updateArrayMany({ value: { $in: tags } }, { $push: { taggedItems: itemId } });
+    return { msg: `Item ${itemId} successfully added to tags` };
   }
 
   async deleteItemFromAll(itemId: ObjectId) {
@@ -45,7 +52,14 @@ export default class TagConcept {
   private async uniqueTag(tag: string) {
     const maybeItem = await this.tags.readOne({ value: tag });
     if (maybeItem) {
-      throw new NotAllowedError(`Tag already exists!`);
+      throw new NotAllowedError(`Tag ${tag} already exists!`);
+    }
+  }
+
+  private async tagExists(tag: string) {
+    const maybeItem = await this.tags.readOne({ value: tag });
+    if (maybeItem == null) {
+      throw new NotAllowedError(`Tag ${tag} does not exists!`);
     }
   }
 
