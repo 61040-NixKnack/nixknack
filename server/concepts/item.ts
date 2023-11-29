@@ -11,7 +11,7 @@ export interface ItemDoc extends BaseDoc {
 }
 
 export default class ItemConcept {
-  public readonly items = new DocCollection<ItemDoc>("users");
+  public readonly items = new DocCollection<ItemDoc>("items");
 
   async create(user: ObjectId, name: String, location: String, purpose: String, lastUsedDate: Date){
     await this.isItemUnique(user, name)
