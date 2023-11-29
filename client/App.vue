@@ -28,7 +28,7 @@ onBeforeMount(async () => {
   <RouterView class="content" />
   <nav v-show="currentRouteName != 'Login'">
     <RouterLink :to="{ name: 'Catalog' }">
-      <div id="home-button" class="nav-target" :class="{ active_target: currentRouteName == 'Catalog' }">
+      <div id="home-button" class="nav-target" :class="{ active_target: currentRouteName == 'Catalog' || currentRouteName == 'Item' }">
         <div class="target_overlay">
           <div class="material-symbols-outlined nav-target-icon">grid_view</div>
         </div>
