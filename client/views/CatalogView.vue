@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
+import SearchBarComponent from "@/components/SearchBar/SearchBarComponent.vue";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 </script>
@@ -8,6 +9,8 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 <template>
   <main>
     <h1>Your KnickKnacks</h1>
+    <SearchBarComponent />
+    <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.vectorkhazana.com%2Fpiranha-plant-svg&psig=AOvVaw0V60ZMy5Yhvt-7Zh3ZR4TG&ust=1701468066443000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCKjUqM_c7IIDFQAAAAAdAAAAABAE">
     <button id="new-post-fab" class="material-symbols-outlined" @click="console.log('Add item button clicked')">add</button>
   </main>
 </template>
