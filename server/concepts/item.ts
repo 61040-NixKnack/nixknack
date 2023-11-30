@@ -28,6 +28,11 @@ export default class ItemConcept {
     return items;
   }
 
+  async getItem(_id: ObjectId) {
+    await this.itemExists(_id);
+    return await this.items.readOne({ _id });
+  }
+
   async update(_id: ObjectId, update: Partial<ItemDoc>) {
     await this.itemExists(_id);
     await this.items.updateOne({ _id }, update);
@@ -51,6 +56,15 @@ export default class ItemConcept {
     if (maybeItem === null) {
       throw new ItemOwnerNotMatchError(owner, _id);
     }
+  }
+
+  /**
+   * @param owner owner of the item
+   * @param items list of items
+   * @returns number of items in `items` that is owner by `owner`
+   */
+  async getItemCount(owner: ObjectId, items: ObjectId[]) {
+    return await this.items.count({ owner: owner, _id: { $in: items } });
   }
 }
 
