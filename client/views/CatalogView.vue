@@ -1,16 +1,31 @@
 <script setup lang="ts">
+import CatalogInfoComponent from "@/components/Catalog/CatalogInfoComponent.vue";
+import SearchBarComponent from "@/components/SearchBar/SearchBarComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import SearchBarComponent from "@/components/SearchBar/SearchBarComponent.vue";
+
+type CatalogInfoType = { itemId: string; itemName: string; itemUrl: string };
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+
+const itemData: CatalogInfoType[] = [];
+
+for (let i = 0; i < 10; i++) {
+  itemData.push({ itemId: i.toString(), itemName: "Piranha Plant", itemUrl: "client/assets/images/piranha_plant.jpg" });
+}
 </script>
 
 <template>
   <main>
     <h1>Your KnickKnacks</h1>
-    <SearchBarComponent />
-    <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.vectorkhazana.com%2Fpiranha-plant-svg&psig=AOvVaw0V60ZMy5Yhvt-7Zh3ZR4TG&ust=1701468066443000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCKjUqM_c7IIDFQAAAAAdAAAAABAE">
+
+    <div class="catalog-content">
+      <SearchBarComponent />
+      <div class="item-list">
+        <CatalogInfoComponent v-for="item in itemData" :key="item.itemId" :itemName="item.itemName" :itemUrl="item.itemUrl" />
+      </div>
+    </div>
+
     <button id="new-post-fab" class="material-symbols-outlined" @click="console.log('Add item button clicked')">add</button>
   </main>
 </template>
@@ -23,6 +38,22 @@ main {
 h1 {
   text-align: left;
   color: var(--on-primary);
+}
+.catalog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 16px;
+}
+
+.item-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 16px;
+  column-gap: 16px;
 }
 
 #new-post-fab {
