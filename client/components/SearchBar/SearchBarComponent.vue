@@ -16,6 +16,7 @@ const emit = defineEmits(["getItemsByQuery"]);
 <style scoped>
 form {
   min-width: 360px;
+  width: 100%;
   max-width: 720px;
   height: 56px;
   padding: 0 16px;
