@@ -1,19 +1,171 @@
 <script setup lang="ts">
-//import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
+import { formatDateShort } from "../../utils/formatDate";
+import { fetchy } from "../../utils/fetchy";
+import { useToastStore } from "../../stores/toast";
 
-defineProps(["itemID"]);
+const props = defineProps(["itemID"]);
+const itemName = ref("NO_NAME");
+const itemDesc = ref("NO_DESC");
+
+const lastUsed = ref(formatDateShort(new Date()));
+const itemTags = ref([]);
+
+const itemAccessSuccessful = ref(false);
+
+onBeforeMount(async () => {
+  const itemDoc = await fetchy(`/api/items/${props.itemID}`, "GET");
+  itemName.value = itemDoc.name;
+  itemDesc.value = itemDoc.purpose;
+  lastUsed.value = formatDateShort(new Date(itemDoc.lastUsedDate));
+  itemAccessSuccessful.value = true;
+});
+
+const notImplemented = async () => {
+  useToastStore().showToast({ message: "NOT IMPLEMENTED", style: "error" });
+};
+
+// TODO
+// Function to make a fake item
+// const makeFake = async () => {
+//   await fetchy("/api/items", "POST", {
+//     body: { name: "Test Item", purpose: "This is a test description. Real descriptions are more helpful. Just padding this out to be a bit longer", lastUsedDate: new Date().toString() },
+//   });
+// };
 </script>
 
 <template>
-  <p>I'M HEERE NOW</p>
-  <p>{{ itemID }}</p>
+  <main v-if="itemAccessSuccessful">
+    <section id="imgSection">
+      <div class="secondary-div" id="itemImg">
+        <img src="@/assets/images/noImage.png" />
+      </div>
+    </section>
+    <section>
+      <h2>Description</h2>
+      <div class="secondary-div" id="itemDesc">
+        <p>{{ itemDesc }}</p>
+        <div id="last-used">
+          <p><b>Last Used:</b></p>
+          <p>{{ lastUsed }}</p>
+        </div>
+      </div>
+    </section>
+    <section>
+      <h2>Tags</h2>
+      <div id="tag-list">
+        <div v-for="tag in itemTags" :key="tag" class="secondary-div">
+          <strong>{{ tag }}</strong>
+        </div>
+      </div>
+    </section>
+    <section id="options">
+      <!-- TODO -->
+      <button @click="notImplemented">Edit</button>
+      <button @click="notImplemented">Discard</button>
+    </section>
+  </main>
+  <div v-else>
+    <h1>Page Not Found</h1>
+    <p>The page that you requested could not be found.</p>
+    <RouterLink to="/" class="button"> Return to the home page </RouterLink>
+  </div>
 </template>
 
 <style scoped>
+main {
+  height: calc(100vh - 80px);
+  aspect-ratio: 9/16;
+  max-width: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+section {
+  color: var(--on-primary);
+}
+
 form {
   display: flex;
   gap: 0.5em;
   padding: 1em;
   align-items: center;
+}
+
+.secondary-div {
+  background-color: var(--secondary);
+  color: var(--on-secondary);
+  border-radius: 10px;
+  border: solid var(--secondary) 20px;
+}
+
+#imgSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#itemImg {
+  display: block;
+  height: fit-content;
+  width: fit-content;
+}
+
+#itemDesc {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  text-wrap: wrap;
+  border-top: 10px;
+  border-bottom: 10px;
+  font-size: 20px;
+  text-align: center;
+  max-width: 100%;
+}
+
+#last-used {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+#tag-list {
+  width: 100%;
+  display: flex;
+  justify-content: left;
+  gap: 10px;
+}
+
+#tag-list > * {
+  font-size: 16px;
+  text-align: center;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border: solid var(--secondary) 1px;
+  border-radius: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+#options {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+}
+
+#options button {
+  border: none;
+  background: var(--secondary);
+  color: var(--on-secondary);
+  font-size: 24px;
+  font-weight: bold;
+  width: 100%;
+  margin-left: 5%;
+  margin-right: 5%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 25px;
 }
 </style>
