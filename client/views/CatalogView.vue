@@ -2,6 +2,7 @@
 import CatalogInfoComponent from "@/components/Catalog/CatalogInfoComponent.vue";
 import SearchBarComponent from "@/components/SearchBar/SearchBarComponent.vue";
 import { useUserStore } from "@/stores/user";
+import "@material/web/progress/circular-progress.js";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../utils/fetchy";
@@ -10,18 +11,13 @@ type CatalogInfoType = { itemId: string; itemName: string; itemUrl: string };
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 
-let itemData = ref<CatalogInfoType[]>([]);
-
-for (let i = 0; i < 10; i++) {
-  itemData.value.push({ itemId: i.toString(), itemName: "Piranha Plant", itemUrl: "client/assets/images/piranha_plant.jpg" });
-}
+let itemData = ref<CatalogInfoType[]>();
 
 onBeforeMount(async () => {
-  try {
-    itemData.value = await fetchy("/api/items", "GET");
-  } catch {
-    // User is not logged in
-  }
+  const response = await fetchy("/api/items", "GET");
+  itemData.value = response.map((item) => {
+    return { itemId: item._id, itemName: item.name, itemUrl: item.image ?? "client/assets/images/noimage.png" };
+  });
 });
 </script>
 
@@ -31,7 +27,7 @@ onBeforeMount(async () => {
 
     <div class="catalog-content">
       <SearchBarComponent />
-      <div class="item-list">
+      <div class="item-list" v-if="itemData">
         <CatalogInfoComponent
           v-for="item in itemData"
           :key="item.itemId"
@@ -40,6 +36,7 @@ onBeforeMount(async () => {
           :onclick="() => $router.push({ name: 'Item', params: { id: item.itemId } })"
         />
       </div>
+      <md-circular-progress indeterminate v-else></md-circular-progress>
     </div>
 
     <button id="new-post-fab" class="material-symbols-outlined" @click="console.log('Add item button clicked')">add</button>
@@ -61,6 +58,13 @@ h1 {
   align-items: center;
   gap: 24px;
   width: 100%;
+}
+
+md-circular-progress {
+  --_active-indicator-color: var(--dark-accent);
+  position: fixed;
+  top: 50%;
+  left: 50%;
 }
 
 .item-list {
