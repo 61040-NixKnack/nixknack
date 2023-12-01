@@ -22,7 +22,13 @@ for (let i = 0; i < 10; i++) {
     <div class="catalog-content">
       <SearchBarComponent />
       <div class="item-list">
-        <CatalogInfoComponent v-for="item in itemData" :key="item.itemId" :itemName="item.itemName" :itemUrl="item.itemUrl" />
+        <CatalogInfoComponent
+          v-for="item in itemData"
+          :key="item.itemId"
+          :itemName="item.itemName"
+          :itemUrl="item.itemUrl"
+          :onclick="() => $router.push({ name: 'Item', params: { id: item.itemId } })"
+        />
       </div>
     </div>
 
@@ -43,8 +49,8 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  gap: 16px;
+  gap: 24px;
+  width: 100%;
 }
 
 .item-list {
@@ -54,6 +60,7 @@ h1 {
   justify-content: center;
   row-gap: 16px;
   column-gap: 16px;
+  width: 100%;
 }
 
 #new-post-fab {

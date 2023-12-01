@@ -37,7 +37,6 @@ const props = defineProps(["itemID", "itemUrl", "itemName"]);
 
   max-width: 300px;
   max-height: 300px;
-  /* margin: 16px; */
   border-radius: 28px;
 
   object-fit: contain;
@@ -46,6 +45,5 @@ const props = defineProps(["itemID", "itemUrl", "itemName"]);
 .item-name {
   font-size: 20px;
   font-weight: bold;
-  /* margin: 16px; */
 }
 </style>
