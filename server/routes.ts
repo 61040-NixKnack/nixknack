@@ -135,6 +135,12 @@ class Routes {
     const items = await Tag.getItems(tag);
     return await Item.getItemCount(user, items);
   }
+
+  /**
+   * Get the descriptive recommendation text for a tag
+   * @param tag the tag to get the recommendation for
+   * @returns a recommendation string
+   */
   @Router.get("/recs/:tag")
   async getRecommendation(tag: string) {
     const rec = await Recommendation.getRecommendation(new ObjectId(tag));
