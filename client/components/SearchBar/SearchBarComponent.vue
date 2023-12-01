@@ -6,10 +6,10 @@ const emit = defineEmits(["getItemsByQuery"]);
 </script>
 
 <template>
-  <form @submit.prevent="emit('getPostsByAuthor', author)" class="pure-form">
-    <button type="" class="search-button material-symbols-outlined">search</button>
+  <form class="pure-form">
+    <button class="search-button material-symbols-outlined">search</button>
     <input id="author" type="text" v-model="author" placeholder="Search..." />
-    <button type="" class="search-button material-symbols-outlined">filter_list</button>
+    <button class="search-button material-symbols-outlined">filter_list</button>
   </form>
 </template>
 
