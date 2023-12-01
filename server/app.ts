@@ -1,4 +1,6 @@
 import ItemConcept from "./concepts/item";
+import PlanConcept from "./concepts/plan";
+import PointConcept from "./concepts/point";
 import RecommendationConcept from "./concepts/recommendation";
 import TagConcept from "./concepts/tag";
 import UserConcept from "./concepts/user";
@@ -10,3 +12,5 @@ export const User = new UserConcept();
 export const Item = new ItemConcept();
 export const Recommendation = new RecommendationConcept();
 export const Tag = new TagConcept();
+export const Plan = new PlanConcept();
+export const Point = new PointConcept();

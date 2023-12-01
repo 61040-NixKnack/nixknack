@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Item, Recommendation, Tag, User, WebSession } from "./app";
+import { Item, Point, Recommendation, Tag, User, WebSession } from "./app";
 import { ItemDoc } from "./concepts/item";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -153,6 +153,13 @@ class Routes {
   // @Router.post("/plans")
   // async generatePlan(user: string) {
   // }
+
+  @Router.patch("/points")
+  async addPointsAchievement(session: WebSessionDoc, quantity: number) {
+    const user = WebSession.getUser(session);
+    await Point.addPoints(user, quantity);
+    // TODO: Add achievement
+  }
 }
 
 export default getExpressRouter(new Routes());
