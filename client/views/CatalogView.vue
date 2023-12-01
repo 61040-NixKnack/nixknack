@@ -3,16 +3,26 @@ import CatalogInfoComponent from "@/components/Catalog/CatalogInfoComponent.vue"
 import SearchBarComponent from "@/components/SearchBar/SearchBarComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
+import { onBeforeMount, ref } from "vue";
+import { fetchy } from "../utils/fetchy";
 
 type CatalogInfoType = { itemId: string; itemName: string; itemUrl: string };
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 
-const itemData: CatalogInfoType[] = [];
+let itemData = ref<CatalogInfoType[]>([]);
 
 for (let i = 0; i < 10; i++) {
-  itemData.push({ itemId: i.toString(), itemName: "Piranha Plant", itemUrl: "client/assets/images/piranha_plant.jpg" });
+  itemData.value.push({ itemId: i.toString(), itemName: "Piranha Plant", itemUrl: "client/assets/images/piranha_plant.jpg" });
 }
+
+onBeforeMount(async () => {
+  try {
+    itemData.value = await fetchy("/api/items", "GET");
+  } catch {
+    // User is not logged in
+  }
+});
 </script>
 
 <template>
