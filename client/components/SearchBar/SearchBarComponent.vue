@@ -8,7 +8,7 @@ const emit = defineEmits(["getItemsByQuery"]);
 <template>
   <form class="pure-form">
     <button class="search-button material-symbols-outlined">search</button>
-    <input id="author" type="text" v-model="author" placeholder="Search..." />
+    <input id="author" type="text" placeholder="Search..." />
     <button class="search-button material-symbols-outlined">filter_list</button>
   </form>
 </template>
