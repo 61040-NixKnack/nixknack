@@ -1,4 +1,5 @@
 import ItemConcept from "./concepts/item";
+import RecommendationConcept from "./concepts/recommendation";
 import UserConcept from "./concepts/user";
 import WebSessionConcept from "./concepts/websession";
 
@@ -6,3 +7,4 @@ import WebSessionConcept from "./concepts/websession";
 export const WebSession = new WebSessionConcept();
 export const User = new UserConcept();
 export const Item = new ItemConcept();
+export const Recommendation = new RecommendationConcept();

@@ -1,7 +1,7 @@
-
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Item, User, WebSession } from "./app";
+import { ObjectId } from "mongodb";
+import { Item, Recommendation, User, WebSession } from "./app";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 
@@ -57,7 +57,7 @@ class Routes {
   @Router.get("/items")
   async getItems(user: string) {
     const id = (await User.getUserByUsername(user))._id;
-    const items = await Item.getItems({user: id});
+    const items = await Item.getItems({ user: id });
     return items; // # To Do: Fix Responses, what type of information does front end want?
   }
 
@@ -82,6 +82,11 @@ class Routes {
   //   return Post.delete(_id);
   // }
 
+  @Router.get("/recs/:tag")
+  async getRecommendation(tag: string) {
+    const rec = await Recommendation.getRecommendation(new ObjectId(tag));
+    return rec; // # To Do: Fix Responses, what type of information does front end want?
+  }
 }
 
 export default getExpressRouter(new Routes());
