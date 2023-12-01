@@ -24,6 +24,9 @@ export default class TagConcept {
   }
 
   async addItem(tag: string, itemId: ObjectId) {
+    if (!this.doesTagExist(tag)) {
+      await this.create(tag, 20); // Threshold for other items defaulted to 20
+    }
     await this.itemNotAdded(tag, itemId);
     await this.tags.pushArrayOne({ value: tag }, { taggedItems: itemId });
     return { msg: `Item ${itemId} added for tag ${tag}!` };
@@ -70,6 +73,14 @@ export default class TagConcept {
     if (maybeItem == null) {
       throw new NotAllowedError(`Tag ${tag} does not exists!`);
     }
+  }
+
+  private async doesTagExist(tag: string) {
+    const maybeItem = await this.tags.readOne({ value: tag });
+    if (maybeItem == null) {
+      return false;
+    }
+    return true;
   }
 
   private async itemAdded(tag: string, itemId: ObjectId) {
