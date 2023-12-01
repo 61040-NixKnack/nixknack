@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Item, Tag, User, WebSession } from "./app";
+import { Item, Recommendation, Tag, User, WebSession } from "./app";
 import { ItemDoc } from "./concepts/item";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -134,6 +134,17 @@ class Routes {
     const user = WebSession.getUser(session);
     const items = await Tag.getItems(tag);
     return await Item.getItemCount(user, items);
+  }
+
+  /**
+   * Get the descriptive recommendation text for a tag
+   * @param tag the tag to get the recommendation for
+   * @returns a recommendation string
+   */
+  @Router.get("/recs/:tag")
+  async getRecommendation(tag: string) {
+    const rec = await Recommendation.getRecommendation(tag);
+    return rec; // # To Do: Fix Responses, what type of information does front end want?
   }
 }
 

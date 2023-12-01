@@ -7,6 +7,8 @@
   --secondary: #375b6d;
   --on-secondary: #e3ebf6;
   --on-primary: #0e171b;
+
+  background-color: var(--primary);
 }
 
 button.btn-small {
