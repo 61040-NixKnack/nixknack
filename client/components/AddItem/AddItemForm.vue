@@ -24,11 +24,9 @@ const createItem = async (name: string, lastUsedDate: string, location: string, 
 
     await makeFake();
     emit("closeSheet");
-    emit("refreshPosts");
   } catch (_) {
     return;
   }
-
   //   void updateStatus();
   emptyForm();
 };
@@ -87,7 +85,6 @@ md-outlined-text-field {
 .creation-form-header {
   display: flex;
   /* flex-direction: row; */
-  justify-content:;
   /* align-items: flex-start; */
   /* float: left; */
   /* gap: 0vw; */
