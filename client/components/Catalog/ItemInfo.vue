@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import router from "@/router/index";
 import { onBeforeMount, ref } from "vue";
-import { formatDateShort } from "../../utils/formatDate";
-import { fetchy } from "../../utils/fetchy";
 import { useToastStore } from "../../stores/toast";
-import router from "/Users/cnf/Desktop/6.1040/nixknack/client/router/index";
+import { fetchy } from "../../utils/fetchy";
+import { formatDateShort } from "../../utils/formatDate";
 
 const props = defineProps(["itemID"]);
 const itemName = ref("NO_NAME");
