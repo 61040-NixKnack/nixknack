@@ -22,7 +22,7 @@ export default class RecommendationConcept {
   private async create(tag: string, text: string) {
     await this.canCreate(tag, text);
     const _id = await this.recs.createOne({ tag, text });
-    return { msg: "Recommendation created successfully!", user: await this.recs.readOne({ _id }) };
+    return { msg: "Recommendation created successfully!", rec: await this.recs.readOne({ _id }) };
   }
 
   private async delete(tag: string) {
