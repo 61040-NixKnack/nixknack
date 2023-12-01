@@ -3,26 +3,31 @@ import { onBeforeMount, ref } from "vue";
 import { formatDateShort } from "../../utils/formatDate";
 import { fetchy } from "../../utils/fetchy";
 import { useToastStore } from "../../stores/toast";
+import router from "/Users/cnf/Desktop/6.1040/nixknack/client/router/index";
 
 const props = defineProps(["itemID"]);
 const itemName = ref("NO_NAME");
 const itemDesc = ref("NO_DESC");
-
 const lastUsed = ref(formatDateShort(new Date()));
 const itemTags = ref([]);
 
-const itemAccessSuccessful = ref(false);
-
 onBeforeMount(async () => {
-  const itemDoc = await fetchy(`/api/items/${props.itemID}`, "GET");
-  itemName.value = itemDoc.name;
-  itemDesc.value = itemDoc.purpose;
-  lastUsed.value = formatDateShort(new Date(itemDoc.lastUsedDate));
-  itemAccessSuccessful.value = true;
+  try {
+    const itemDoc = await fetchy(`/api/items/${props.itemID}`, "GET");
+    itemName.value = itemDoc.name;
+    itemDesc.value = itemDoc.purpose;
+    lastUsed.value = formatDateShort(new Date(itemDoc.lastUsedDate));
+  } catch (error) {
+    await router.push({ name: "not-found-page" });
+  }
 });
 
 const notImplemented = async () => {
   useToastStore().showToast({ message: "NOT IMPLEMENTED", style: "error" });
+};
+
+const goBack = async () => {
+  await router.push({ name: "Catalog" });
 };
 
 // TODO
@@ -35,7 +40,11 @@ const notImplemented = async () => {
 </script>
 
 <template>
-  <main v-if="itemAccessSuccessful">
+  <main>
+    <section id="return">
+      <div class="material-symbols-outlined" id="back_arr" @click="goBack"><b>arrow_back</b></div>
+      <h1>{{ itemName }}</h1>
+    </section>
     <section id="imgSection">
       <div class="secondary-div" id="itemImg">
         <img src="@/assets/images/noImage.png" />
@@ -65,11 +74,6 @@ const notImplemented = async () => {
       <button @click="notImplemented">Discard</button>
     </section>
   </main>
-  <div v-else>
-    <h1>Page Not Found</h1>
-    <p>The page that you requested could not be found.</p>
-    <RouterLink to="/" class="button"> Return to the home page </RouterLink>
-  </div>
 </template>
 
 <style scoped>
@@ -98,6 +102,16 @@ form {
   color: var(--on-secondary);
   border-radius: 10px;
   border: solid var(--secondary) 20px;
+}
+
+#return {
+  display: flex;
+  align-items: center;
+}
+
+#back_arr {
+  font-size: 40px;
+  font-weight: bold;
 }
 
 #imgSection {
