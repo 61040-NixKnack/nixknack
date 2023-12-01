@@ -71,10 +71,15 @@ class Routes {
    * @returns the item ItemDoc and the tags for given item ID
    */
   @Router.get("/items/:_id")
-  async getItem(_id: ObjectId) {
+  async getItem(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
     const id = new ObjectId(_id);
     const item = await Item.getItem(id);
+    await Item.itemExists(id);
     const tags = await Tag.getTags(id);
+    if (item) {
+      await Item.isOwner(item.owner, user);
+    }
     return { owner: item?.owner, name: item?.name, lastUsedDate: item?.lastUsedDate, location: item?.location, purpose: item?.purpose, tags: tags };
   }
 
