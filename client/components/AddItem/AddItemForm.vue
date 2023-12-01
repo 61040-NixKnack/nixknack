@@ -45,7 +45,7 @@ const emptyForm = () => {
       <div class="creation-form-header">
         <h2 class="hint-text">Add a KnickKnack (Submit form for a test item!)</h2>
       </div>
-      <img src="client/assets/images/noimage.png" alt="No image" class="default-image" />
+      <img src="@/assets/images/noImage.png" alt="No image" class="default-image" />
       <md-outlined-text-field v-model="name" label="Name" placeholder="Name"></md-outlined-text-field>
       <md-outlined-text-field v-mode="lastUsedDate" label="Last Used Date" placeholder="mm/dd/yyyy"></md-outlined-text-field>
       <md-outlined-text-field v-model="location" label="Location" placeholder="Location"></md-outlined-text-field>
