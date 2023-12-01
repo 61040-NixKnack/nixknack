@@ -74,12 +74,10 @@ class Routes {
   async getItem(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
     const id = new ObjectId(_id);
-    const item = await Item.getItem(id);
     await Item.itemExists(id);
+    const item = await Item.getItem(id);
     const tags = await Tag.getTags(id);
-    if (item) {
-      await Item.isOwner(item.owner, user);
-    }
+    await Item.isOwner(user, id);
     return { owner: item?.owner, name: item?.name, lastUsedDate: item?.lastUsedDate, location: item?.location, purpose: item?.purpose, tags: tags };
   }
 
