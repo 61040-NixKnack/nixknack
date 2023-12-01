@@ -11,6 +11,8 @@ import {
   FindOptions,
   ObjectId,
   OptionalUnlessRequiredId,
+  PullOperator,
+  PushOperator,
   ReplaceOptions,
   UpdateResult,
   WithId,
@@ -113,6 +115,38 @@ export default class DocCollection<Schema extends BaseDoc> {
     this.sanitizeFilter(filter);
     update.dateUpdated = new Date();
     return await this.collection.updateOne(filter, { $set: update }, options);
+  }
+
+  /**
+   * Add to an array field of a document that matches `filter` based on options.
+   */
+  async pushArrayOne(filter: Filter<Schema>, update: PushOperator<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
+    this.sanitizeFilter(filter);
+    return await this.collection.updateOne(filter, { $push: update }, options);
+  }
+
+  /**
+   * Add to an array field of documents that matches `filter` based on options.
+   */
+  async pushArrayMany(filter: Filter<Schema>, update: PushOperator<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
+    this.sanitizeFilter(filter);
+    return await this.collection.updateMany(filter, { $push: update }, options);
+  }
+
+  /**
+   * Remove from an array field of a document that matches `filter` based on options.
+   */
+  async removeArrayOne(filter: Filter<Schema>, update: PullOperator<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
+    this.sanitizeFilter(filter);
+    return await this.collection.updateOne(filter, { $pull: update }, options);
+  }
+
+  /**
+   * Remove from an array field of documents that matches `filter` based on options.
+   */
+  async removeArrayMany(filter: Filter<Schema>, update: PullOperator<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
+    this.sanitizeFilter(filter);
+    return await this.collection.updateMany(filter, { $pull: update }, options);
   }
 
   /**
