@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AddItemForm from "@/components/AddItem/AddItemForm.vue";
 import CatalogInfoComponent from "@/components/Catalog/CatalogInfoComponent.vue";
 import SearchBarComponent from "@/components/SearchBar/SearchBarComponent.vue";
 import { useUserStore } from "@/stores/user";
@@ -10,7 +11,7 @@ import { fetchy } from "../utils/fetchy";
 type CatalogInfoType = { itemId: string; itemName: string; itemUrl: string };
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
-
+const openOverlay = ref(false);
 let itemData = ref<CatalogInfoType[]>();
 
 onBeforeMount(async () => {
@@ -39,13 +40,30 @@ onBeforeMount(async () => {
       <md-circular-progress indeterminate v-else></md-circular-progress>
     </div>
 
-    <button id="new-post-fab" class="material-symbols-outlined" @click="console.log('Add item button clicked')">add</button>
+    <div class="overlay" v-if="openOverlay">
+      <AddItemForm @closeSheet="openOverlay = false" />
+    </div>
+
+    <button id="new-post-fab" class="material-symbols-outlined" @click="openOverlay = true">add</button>
   </main>
 </template>
 
 <style scoped>
 main {
   padding: 8px 36px;
+}
+
+.overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: flex;
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
 }
 
 h1 {
