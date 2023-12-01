@@ -67,6 +67,11 @@ const router = createRouter({
       name: "not-found",
       component: NotFoundView,
     },
+    {
+      path: "/notfound",
+      name: "not-found-page",
+      component: NotFoundView,
+    },
   ],
 });
 
