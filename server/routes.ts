@@ -143,7 +143,7 @@ class Routes {
    */
   @Router.get("/recs/:tag")
   async getRecommendation(tag: string) {
-    const rec = await Recommendation.getRecommendation(new ObjectId(tag));
+    const rec = await Recommendation.getRecommendation(tag);
     return rec; // # To Do: Fix Responses, what type of information does front end want?
   }
 }
