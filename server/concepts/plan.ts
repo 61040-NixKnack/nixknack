@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotFoundError } from "./errors";
+import { NotAllowedError, NotFoundError } from "./errors";
 
 const TASKS_PER_DAY = 3;
 
@@ -41,6 +41,8 @@ export default class PlanConcept {
   }
 
   async create(user: ObjectId, deadline: Date, tasks: ObjectId[]) {
+    await this.alreadyHasPlan(user, deadline);
+
     const selected: ObjectId[] = this.choose(tasks, TASKS_PER_DAY);
     const _id = await this.plans.createOne({ user, deadline, tasks: selected });
     return { msg: "User created successfully!", plan: await this.plans.readOne({ _id }) };
@@ -53,5 +55,21 @@ export default class PlanConcept {
       user,
       deadline: { $lt: curDate },
     });
+  }
+
+  private async alreadyHasPlan(user: ObjectId, deadline: Date) {
+    const plan = await this.plans.readOne({ user, deadline });
+    if (plan !== null) {
+      throw new AlreadyCreatedPlanError(user, deadline);
+    }
+  }
+}
+
+export class AlreadyCreatedPlanError extends NotAllowedError {
+  constructor(
+    public readonly user: ObjectId,
+    public readonly deadline: Date,
+  ) {
+    super("{0} already has a plan for date {1}!", user, deadline);
   }
 }

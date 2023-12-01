@@ -149,6 +149,10 @@ class Routes {
     const rec = await Recommendation.getRecommendation(tag);
     return rec; // # To Do: Fix Responses, what type of information does front end want?
   }
+
+  // @Router.post("/plans")
+  // async generatePlan(user: string) {
+  // }
 }
 
 export default getExpressRouter(new Routes());
