@@ -179,14 +179,31 @@ class Routes {
     const userTags = await Tag.getTags(items);
     const itemsByTag = await Tag.itemsByTag(userTags, items);
 
-    const recPool = [];
+    const taskPool = [];
 
     for (const [tag, itm] of itemsByTag) {
-      const rec = Recommendation.getRecommendation(tag);
+      const rec = await Recommendation.getRecommendation(tag);
       if (itm.length > ((await Tag.getTagTN(tag)) ?? 0)) {
-        recPool.push(...itm.map((i) => `${i}: ${rec}`));
-        // Do stuff with Task
+        taskPool.push(...itm.map((i) => [user, rec, i])); // TODO: figure out Task pool
       }
+    }
+
+    // Start 7 days ahead
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    d.setHours(0);
+    d.setMinutes(0);
+    d.setSeconds(0);
+
+    // Current date
+    const minDate = new Date();
+    minDate.setHours(0);
+    minDate.setMinutes(0);
+    minDate.setSeconds(0);
+
+    while (d >= minDate && !Plan.getTasksAtDate(user, d)) {
+      await Plan.create(user, d, []); // Figure out the task pool stuff
+      d.setDate(d.getDate() - 1);
     }
   }
 

@@ -9,14 +9,14 @@ export interface RecommendationDoc extends BaseDoc {
 export default class RecommendationConcept {
   public readonly recs = new DocCollection<RecommendationDoc>("recommendations");
 
-  async getRecommendation(tag: string): Promise<string> {
+  async getRecommendation(tag: string) {
     const recStr = await this.recs.readOne({ tag });
 
     if (!recStr) {
       throw new NotFoundError(`Recommendation for tag ${tag} not found!`);
     }
 
-    return recStr.text;
+    return recStr;
   }
 
   private async create(tag: string, text: string) {
