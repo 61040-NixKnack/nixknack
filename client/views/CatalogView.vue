@@ -49,7 +49,7 @@ onBeforeMount(reloadCatalog);
         "
       />
       <div class="shade" @click="openOverlay = false"></div>
-      <AddItemForm class="add-item-form" @closeSheet="openOverlay = false" @click="console.log('form clicked!')" />
+      <AddItemForm class="add-item-form" @closeSheet="openOverlay = false" />
     </div>
 
     <button id="new-post-fab" class="material-symbols-outlined" @click="openOverlay = true">add</button>
