@@ -13,7 +13,8 @@ export default class TaskConcept {
 
   async assign(user: ObjectId, rec: ObjectId, item: ObjectId) {
     await this.uniqueTask(user, rec, item);
-    await this.tasks.createOne({ objective: rec, assignee: user, item: item });
+    const _id = await this.tasks.createOne({ objective: rec, assignee: user, item: item });
+    return { msg: `Task for user ${user} and item ${item} with rec ${rec} successfully created`, _id: _id };
   }
 
   async complete(_id: ObjectId) {
