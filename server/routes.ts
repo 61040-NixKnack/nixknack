@@ -124,7 +124,7 @@ class Routes {
   @Router.get("/items/:_id/tags")
   async getTagsForItem(_id: ObjectId) {
     const id = new ObjectId(_id);
-    return await Tag.getTags(id);
+    return await Tag.getTags([id]);
   }
 
   /**
