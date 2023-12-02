@@ -31,6 +31,11 @@ export default class TaskConcept {
     }
   }
 
+  async getTasks(query: Filter<TaskDoc>) {
+    const tasks = await this.tasks.readMany(query);
+    return tasks.map((task) => task._id);
+  }
+
   async deleteAll(query: Filter<TaskDoc>) {
     await this.tasks.deleteMany(query);
     return { msg: `All tasks with query ${query} deleted!` };
