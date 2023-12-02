@@ -48,7 +48,8 @@ export default class AchievementConcept {
     return userAchievements;
   }
 
-  async updateLevelAchievement(user: ObjectId, points: number) {
-    await this.user_achieves.updateOne({ user, name: "Experience" }, { progress: points });
+  async updateAchievement(user: ObjectId, name: string, progress: number) {
+    await this.user_achieves.updateOne({ user, name }, { progress }, { upsert: true });
+    return { msg: `Updated progress of achievement ${name} to ${progress}` };
   }
 }
