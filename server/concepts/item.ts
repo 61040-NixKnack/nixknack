@@ -39,8 +39,8 @@ export default class ItemConcept {
     return { msg: "Item updated successfully!" };
   }
 
-  async delete(_id: ObjectId) {
-    await this.items.deleteOne({ _id });
+  async delete(query: Filter<ItemDoc>) {
+    await this.items.deleteMany(query);
     return { msg: "Item deleted!" };
   }
 

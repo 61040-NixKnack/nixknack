@@ -35,10 +35,15 @@ class Routes {
     return await User.update(user, update);
   }
 
+  // TODO Delete everything for user
   @Router.delete("/users")
   async deleteUser(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     WebSession.end(session);
+    await Task.deleteAll({ assignee: user });
+    const items = await Item.getItems({ owner: user });
+    await Tag.deleteItemFromAll(items.map((item) => item._id));
+    await Item.delete({ owner: user });
     return await User.delete(user);
   }
 
@@ -101,9 +106,9 @@ class Routes {
     const id = new ObjectId(_id);
     const user = WebSession.getUser(session);
     await Item.isOwner(user, id);
-    await Tag.deleteItemFromAll(id); // Delete item from all tags.
-    await Task.deleteItem(id);
-    return Item.delete(id);
+    await Tag.deleteItemFromAll([id]); // Delete item from all tags.
+    await Task.deleteAll({ item: id });
+    return Item.delete({ _id: id });
   }
 
   @Router.post("/items/:_id/:tags")
@@ -149,6 +154,20 @@ class Routes {
   async getRecommendation(tag: string) {
     const rec = await Recommendation.getRecommendation(tag);
     return rec; // # To Do: Fix Responses, what type of information does front end want?
+  }
+
+  @Router.get("/task/:_id")
+  async completeTask(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    const id = new ObjectId(_id);
+    await Task.isAssigned(user, id);
+    const item = await Task.complete(id);
+    if (item) {
+      await Tag.deleteItemFromAll([item]);
+      await Item.delete({ _id: item });
+    }
+    // await Point.addPoints(user, 10);
+    // await Achievement.progress(user, Achievement.NAMES.completedTasks, 1);
   }
 }
 
