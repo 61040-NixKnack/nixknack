@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Item, Point, Recommendation, Tag, User, WebSession } from "./app";
+import { Item, Plan, Point, Recommendation, Tag, User, WebSession } from "./app";
 import { ItemDoc } from "./concepts/item";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -39,6 +39,8 @@ class Routes {
   async deleteUser(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     WebSession.end(session);
+    await Point.deleteByUser(user);
+    await Plan.deleteByUser(user);
     return await User.delete(user);
   }
 

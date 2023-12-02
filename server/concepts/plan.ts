@@ -57,6 +57,11 @@ export default class PlanConcept {
     });
   }
 
+  async deleteByUser(user: ObjectId) {
+    await this.plans.deleteMany({ user });
+    return { msg: "Plans deleted!" };
+  }
+
   private async alreadyHasPlan(user: ObjectId, deadline: Date) {
     const plan = await this.plans.readOne({ user, deadline });
     if (plan !== null) {

@@ -31,4 +31,9 @@ export default class PointConcept {
     await this.points.updateOne({ user }, { points: newPoints }, { upsert: true });
     return { msg: `Points updated from ${pts} to ${newPoints}!` };
   }
+
+  async deleteByUser(user: ObjectId) {
+    await this.points.deleteOne({ user });
+    return { msg: "Points deleted!" };
+  }
 }
