@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotAllowedError } from "./errors";
 
@@ -8,7 +8,7 @@ export interface TaskDoc extends BaseDoc {
   item: ObjectId;
 }
 
-export default class ItemConcept {
+export default class TaskConcept {
   public readonly tasks = new DocCollection<TaskDoc>("tasks");
 
   async assign(user: ObjectId, rec: ObjectId, item: ObjectId) {
@@ -16,18 +16,23 @@ export default class ItemConcept {
     await this.tasks.createOne({ objective: rec, assignee: user, item: item });
   }
 
-  async complete(user: ObjectId, rec: ObjectId) {
-    await this.itemExists(user, rec);
-    const task = await this.tasks.readOne({ assignee: user, objective: rec });
+  async complete(_id: ObjectId) {
+    await this.itemExists(_id);
+    const task = await this.tasks.readOne({ _id });
+    await this.tasks.deleteOne({ _id });
     return task?.item;
   }
 
-  async isAssigned(user: ObjectId, rec: ObjectId, item: ObjectId) {
-    const maybeTask = await this.tasks.readOne({ objective: rec, assignee: user, item: item });
-    if (maybeTask !== null) {
-      return true;
+  async isAssigned(user: ObjectId, _id: ObjectId) {
+    const maybeTask = await this.tasks.readOne({ _id: _id, assignee: user });
+    if (maybeTask === null) {
+      throw new NotAllowedError(`Task ${_id} is not assigned for user ${user}`);
     }
-    return false;
+  }
+
+  async deleteAll(query: Filter<TaskDoc>) {
+    await this.tasks.deleteMany(query);
+    return { msg: `All tasks with query ${query} deleted!` };
   }
 
   private async uniqueTask(user: ObjectId, rec: ObjectId, item: ObjectId) {
@@ -37,10 +42,10 @@ export default class ItemConcept {
     }
   }
 
-  private async itemExists(user: ObjectId, rec: ObjectId) {
-    const maybeTask = await this.tasks.readOne({ objective: rec, assignee: user });
+  private async itemExists(_id: ObjectId) {
+    const maybeTask = await this.tasks.readOne({ _id });
     if (maybeTask === null) {
-      throw new NotAllowedError(`Task for user ${user} and rec ${rec} does not exist!`);
+      throw new NotAllowedError(`Task ${_id} does not exist!`);
     }
   }
 }

@@ -47,7 +47,7 @@ const emptyForm = () => {
       </div>
       <img src="@/assets/images/noImage.png" alt="No image" class="default-image" />
       <md-outlined-text-field v-model="name" label="Name" placeholder="Name"></md-outlined-text-field>
-      <md-outlined-text-field v-mode="lastUsedDate" label="Last Used Date" placeholder="mm/dd/yyyy"></md-outlined-text-field>
+      <md-outlined-text-field v-model="lastUsedDate" label="Last Used Date" placeholder="mm/dd/yyyy"></md-outlined-text-field>
       <md-outlined-text-field v-model="location" label="Location" placeholder="Location"></md-outlined-text-field>
       <md-outlined-text-field v-model="purpose" label="Description" type="textarea" placeholder="Description" rows="3" class="description-field"></md-outlined-text-field>
       <md-filled-button type="submit" class="submit-button">Add</md-filled-button>
