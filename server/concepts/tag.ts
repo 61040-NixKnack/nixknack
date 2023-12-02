@@ -48,9 +48,25 @@ export default class TagConcept {
     return { msg: `Item ${itemId} successfully removed from all tags` };
   }
 
-  async getTags(itemId: ObjectId) {
-    const tagsFound = await this.tags.readMany({ taggedItems: itemId });
+  async getTags(itemIds: ObjectId[]) {
+    const tagsFound = await this.tags.readMany({ taggedItems: { $in: itemIds } });
     return tagsFound.map((tag) => tag.value);
+  }
+
+  /**
+   * @param tags list of tags (strings)
+   * @param items list of items (ObjectIds)
+   * @returns Map where key is tag and value is list of items in `items` that have tag `tag`
+   */
+  async itemsByTag(tags: string[], items: ObjectId[]) {
+    const result = new Map<string, ObjectId[]>();
+    for (const tag of tags) {
+      // Get all items with tag and then filter such that only items also in `items` remain
+      const commonItems = (await this.tags.readOne({ value: tag }))?.taggedItems.filter((item) => items.includes(item));
+
+      result.set(tag, commonItems ? commonItems : []);
+    }
+    return result;
   }
 
   async getItems(tag: string) {

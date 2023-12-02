@@ -14,18 +14,19 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 const openOverlay = ref(false);
 let itemData = ref<CatalogInfoType[]>();
 
-onBeforeMount(async () => {
+const reloadCatalog = async () => {
   const response = await fetchy("/api/items", "GET");
   itemData.value = response.map((item: { _id: string; name: string; image: string }) => {
     return { itemId: item._id, itemName: item.name, itemUrl: item.image ?? "client/assets/images/noImage.png" };
   });
-});
+};
+
+onBeforeMount(reloadCatalog);
 </script>
 
 <template>
   <main>
     <h1>Your KnickKnacks</h1>
-
     <div class="catalog-content">
       <SearchBarComponent />
       <div class="item-list" v-if="itemData">
@@ -41,7 +42,14 @@ onBeforeMount(async () => {
     </div>
 
     <div class="overlay" v-if="openOverlay">
-      <AddItemForm @closeSheet="openOverlay = false" />
+      <AddItemForm
+        @closeSheet="
+          openOverlay = false;
+          reloadCatalog();
+        "
+      />
+      <div class="shade" @click="openOverlay = false"></div>
+      <AddItemForm class="add-item-form" @closeSheet="openOverlay = false" @click="console.log('form clicked!')" />
     </div>
 
     <button id="new-post-fab" class="material-symbols-outlined" @click="openOverlay = true">add</button>
@@ -53,7 +61,7 @@ main {
   padding: 8px 36px;
 }
 
-.overlay {
+.shade {
   position: fixed; /* Sit on top of the page content */
   display: flex;
   width: 100%; /* Full width (cover the whole page) */
@@ -64,6 +72,10 @@ main {
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
   z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+}
+
+.add-item-form {
+  z-index: 3;
 }
 
 h1 {
