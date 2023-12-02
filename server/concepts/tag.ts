@@ -63,7 +63,6 @@ export default class TagConcept {
     for (const tag of tags) {
       // Get all items with tag and then filter such that only items also in `items` remain
       const commonItems = (await this.tags.readOne({ value: tag }))?.taggedItems.filter((item) => items.includes(item));
-
       result.set(tag, commonItems ? commonItems : []);
     }
     return result;
