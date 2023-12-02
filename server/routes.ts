@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Item, Recommendation, Tag, Task, User, WebSession } from "./app";
+import { Item, Plan, Point, Recommendation, Tag, Task, User, WebSession } from "./app";
 import { ItemDoc } from "./concepts/item";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -44,6 +44,8 @@ class Routes {
     const items = await Item.getItems({ owner: user });
     await Tag.deleteItemFromAll(items.map((item) => item._id));
     await Item.delete({ owner: user });
+    await Point.deleteByUser(user);
+    await Plan.deleteByUser(user);
     return await User.delete(user);
   }
 
@@ -168,6 +170,48 @@ class Routes {
     }
     // await Point.addPoints(user, 10);
     // await Achievement.progress(user, Achievement.NAMES.completedTasks, 1);
+  }
+
+  @Router.post("/plans")
+  async generatePlan(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const items = (await Item.getItems({ owner: user })).map((item) => item._id);
+    const userTags = await Tag.getTags(items);
+    const itemsByTag = await Tag.itemsByTag(userTags, items);
+
+    const taskPool = [];
+
+    for (const [tag, itm] of itemsByTag) {
+      const rec = await Recommendation.getRecommendation(tag);
+      if (itm.length > ((await Tag.getTagTN(tag)) ?? 0)) {
+        taskPool.push(...itm.map((i) => [user, rec, i])); // TODO: figure out Task pool
+      }
+    }
+
+    // Start 7 days ahead
+    const d = new Date();
+    d.setDate(d.getDate() + 6);
+    d.setHours(0);
+    d.setMinutes(0);
+    d.setSeconds(0);
+
+    // Current date
+    const minDate = new Date();
+    minDate.setHours(0);
+    minDate.setMinutes(0);
+    minDate.setSeconds(0);
+
+    while (d >= minDate && !(await Plan.getTasksAtDate(user, d))) {
+      await Plan.create(user, d, []); // Figure out the task pool stuff
+      d.setDate(d.getDate() - 1);
+    }
+  }
+
+  @Router.patch("/points")
+  async addPointsAchievement(session: WebSessionDoc, quantity: number) {
+    const user = WebSession.getUser(session);
+    await Point.addPoints(user, quantity);
+    // TODO: Add achievement
   }
 }
 

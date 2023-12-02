@@ -9,20 +9,20 @@ export interface RecommendationDoc extends BaseDoc {
 export default class RecommendationConcept {
   public readonly recs = new DocCollection<RecommendationDoc>("recommendations");
 
-  async getRecommendation(tag: string): Promise<string> {
+  async getRecommendation(tag: string) {
     const recStr = await this.recs.readOne({ tag });
 
     if (!recStr) {
       throw new NotFoundError(`Recommendation for tag ${tag} not found!`);
     }
 
-    return recStr.text;
+    return recStr;
   }
 
   private async create(tag: string, text: string) {
     await this.canCreate(tag, text);
     const _id = await this.recs.createOne({ tag, text });
-    return { msg: "Recommendation created successfully!", user: await this.recs.readOne({ _id }) };
+    return { msg: "Recommendation created successfully!", rec: await this.recs.readOne({ _id }) };
   }
 
   private async delete(tag: string) {
