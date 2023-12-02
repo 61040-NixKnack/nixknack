@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotAllowedError, NotFoundError } from "./errors";
+import { NotFoundError } from "./errors";
 
 export interface PointDoc extends BaseDoc {
   user: ObjectId;
@@ -18,29 +18,17 @@ export default class PointConcept {
     return maybePts.points;
   }
 
-  async initPoints(user: ObjectId) {
-    await this.alreadyInitialized(user);
-    const _id = await this.points.createOne({ user, points: 0 });
-    return { msg: "Points initialized successfully!", points: await this.points.readOne({ _id }) };
-  }
-
   async addPoints(user: ObjectId, quantity: number) {
     const maybePts = await this.points.readOne({ user });
 
-    if (!maybePts) {
-      throw new NotFoundError(`Points for user ${user} not found!`);
-    }
-
-    const newPoints = maybePts.points + quantity;
-
-    await this.points.updateOne({ user }, { points: newPoints });
-    return { msg: `Points updated from ${maybePts.points} to ${newPoints}!` };
-  }
-
-  private async alreadyInitialized(user: ObjectId) {
-    const maybePts = await this.points.readOne({ user });
+    let pts = 0;
     if (maybePts) {
-      throw new NotAllowedError(`Points for user ${user} already initialized`);
+      pts = maybePts.points;
     }
+
+    const newPoints = pts + quantity;
+
+    await this.points.updateOne({ user }, { points: newPoints }, { upsert: true });
+    return { msg: `Points updated from ${pts} to ${newPoints}!` };
   }
 }
