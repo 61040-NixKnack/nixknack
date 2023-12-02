@@ -17,7 +17,7 @@ let itemData = ref<CatalogInfoType[]>();
 const reloadCatalog = async () => {
   const response = await fetchy("/api/items", "GET");
   itemData.value = response.map((item: { _id: string; name: string; image: string }) => {
-    return { itemId: item._id, itemName: item.name, itemUrl: item.image ?? "@/assets/images/noImage.png" };
+    return { itemId: item._id, itemName: item.name, itemUrl: item.image ?? "../client/assets/images/noImage.png" };
   });
 };
 

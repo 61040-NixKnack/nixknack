@@ -6,7 +6,7 @@ const props = defineProps(["itemID", "itemUrl", "itemName"]);
 
 <template>
   <div class="tile">
-    <img class="item-image" :src="props.itemUrl" />
+    <img class="item-image" :src="itemUrl" />
     <div class="item-name">{{ props.itemName }}</div>
   </div>
 </template>
