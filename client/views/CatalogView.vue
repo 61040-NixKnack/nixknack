@@ -14,18 +14,19 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 const openOverlay = ref(false);
 let itemData = ref<CatalogInfoType[]>();
 
-onBeforeMount(async () => {
+const reloadCatalog = async () => {
   const response = await fetchy("/api/items", "GET");
   itemData.value = response.map((item: { _id: string; name: string; image: string }) => {
     return { itemId: item._id, itemName: item.name, itemUrl: item.image ?? "client/assets/images/noImage.png" };
   });
-});
+};
+
+onBeforeMount(reloadCatalog);
 </script>
 
 <template>
   <main>
     <h1>Your KnickKnacks</h1>
-
     <div class="catalog-content">
       <SearchBarComponent />
       <div class="item-list" v-if="itemData">
@@ -41,9 +42,14 @@ onBeforeMount(async () => {
     </div>
 
     <div class="overlay" v-if="openOverlay">
-      <AddItemForm @closeSheet="openOverlay = false" />
+      <AddItemForm
+        @closeSheet="
+          openOverlay = false;
+          reloadCatalog();
+        "
+      />
     </div>
-
+c
     <button id="new-post-fab" class="material-symbols-outlined" @click="openOverlay = true">add</button>
   </main>
 </template>
