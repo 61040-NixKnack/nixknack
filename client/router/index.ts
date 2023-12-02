@@ -15,10 +15,6 @@ const router = createRouter({
     {
       path: "/",
       redirect: { name: "Catalog" },
-      name: "Home",
-      component: HomeView,
-      meta: { requiresAuth: true },
-      children: [],
     },
     {
       path: "/catalog",
