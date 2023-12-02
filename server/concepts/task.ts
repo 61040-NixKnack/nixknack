@@ -8,7 +8,7 @@ export interface TaskDoc extends BaseDoc {
   item: ObjectId;
 }
 
-export default class ItemConcept {
+export default class TaskConcept {
   public readonly tasks = new DocCollection<TaskDoc>("tasks");
 
   async assign(user: ObjectId, rec: ObjectId, item: ObjectId) {
@@ -28,6 +28,11 @@ export default class ItemConcept {
       return true;
     }
     return false;
+  }
+
+  async deleteItem(item: ObjectId) {
+    await this.tasks.deleteMany({ item });
+    return { msg: `All tasks for item ${item} deleted!` };
   }
 
   private async uniqueTask(user: ObjectId, rec: ObjectId, item: ObjectId) {

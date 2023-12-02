@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Item, Recommendation, Tag, User, WebSession } from "./app";
+import { Item, Recommendation, Tag, Task, User, WebSession } from "./app";
 import { ItemDoc } from "./concepts/item";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -76,7 +76,7 @@ class Routes {
     const id = new ObjectId(_id);
     await Item.itemExists(id);
     const item = await Item.getItem(id);
-    const tags = await Tag.getTags(id);
+    const tags = await Tag.getTags([id]);
     await Item.isOwner(user, id);
     return { owner: item?.owner, name: item?.name, lastUsedDate: item?.lastUsedDate, location: item?.location, purpose: item?.purpose, tags: tags };
   }
@@ -102,6 +102,7 @@ class Routes {
     const user = WebSession.getUser(session);
     await Item.isOwner(user, id);
     await Tag.deleteItemFromAll(id); // Delete item from all tags.
+    await Task.deleteItem(id);
     return Item.delete(id);
   }
 
