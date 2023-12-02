@@ -42,14 +42,14 @@ onBeforeMount(reloadCatalog);
     </div>
 
     <div class="overlay" v-if="openOverlay">
+      <div class="shade" @click="openOverlay = false"></div>
       <AddItemForm
+        class="add-item-form"
         @closeSheet="
           openOverlay = false;
           reloadCatalog();
         "
       />
-      <div class="shade" @click="openOverlay = false"></div>
-      <AddItemForm class="add-item-form" @closeSheet="openOverlay = false" />
     </div>
 
     <button id="new-post-fab" class="material-symbols-outlined" @click="openOverlay = true">add</button>
@@ -62,6 +62,7 @@ main {
 }
 
 .shade {
+  overflow: hidden;
   position: fixed; /* Sit on top of the page content */
   display: flex;
   width: 100%; /* Full width (cover the whole page) */
@@ -75,7 +76,13 @@ main {
 }
 
 .add-item-form {
+  position: fixed; /* Sit on top of the page content */
+
   z-index: 3;
+  overflow: hidden;
+  /* width: 100%; Full width (cover the whole page) */
+  /* height: 100%; Full height (cover the whole page) */
+  bottom: 0;
 }
 
 h1 {
@@ -91,7 +98,6 @@ h1 {
 }
 
 md-circular-progress {
-  --_active-indicator-color: var(--dark-accent);
   position: fixed;
   top: 50%;
   left: 50%;
