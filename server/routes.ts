@@ -150,9 +150,23 @@ class Routes {
     return rec; // # To Do: Fix Responses, what type of information does front end want?
   }
 
-  // @Router.post("/plans")
-  // async generatePlan(user: string) {
-  // }
+  @Router.post("/plans")
+  async generatePlan(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const items = (await Item.getItems({ owner: user })).map((item) => item._id);
+    const userTags = await Tag.getTags(items);
+    const itemsByTag = await Tag.itemsByTag(userTags, items);
+
+    const recPool = [];
+
+    for (const [tag, itm] of itemsByTag) {
+      const rec = Recommendation.getRecommendation(tag);
+      if (itm.length > ((await Tag.getTagTN(tag)) ?? 0)) {
+        recPool.push(...itm.map((i) => `${i}: ${rec}`));
+        // Do stuff with Task
+      }
+    }
+  }
 
   @Router.patch("/points")
   async addPointsAchievement(session: WebSessionDoc, quantity: number) {
