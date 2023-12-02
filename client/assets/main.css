@@ -8,8 +8,11 @@
   --on-secondary: #e3ebf6;
   --on-primary: #0e171b;
 
+  --md-sys-color-primary: var(--secondary);
+  
   background-color: var(--primary);
 }
+
 
 button.btn-small {
   font-size: 80%;
