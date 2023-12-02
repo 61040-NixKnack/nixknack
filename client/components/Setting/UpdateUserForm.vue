@@ -21,20 +21,64 @@ async function updatePassword() {
 </script>
 
 <template>
-  <h2>Update user details</h2>
-  <form @submit.prevent="updateUsername" class="pure-form">
-    <fieldset>
-      <legend>Change your username</legend>
-      <input type="text" placeholder="New username" v-model="username" required />
-      <button type="submit" class="pure-button pure-button-primary">Update username</button>
-    </fieldset>
-  </form>
+  <main>
+    <form @submit.prevent="updateUsername">
+      <fieldset>
+        <legend>Change Username</legend>
+        <div>
+          <input type="text" placeholder="New username" v-model="username" required />
+          <button type="submit">Update</button>
+        </div>
+      </fieldset>
+    </form>
 
-  <form @submit.prevent="updatePassword" class="pure-form">
-    <fieldset>
-      <legend>Change your password</legend>
-      <input type="password" placeholder="New password" v-model="password" required />
-      <button type="submit" class="pure-button pure-button-primary">Update password</button>
-    </fieldset>
-  </form>
+    <form @submit.prevent="updatePassword">
+      <fieldset>
+        <legend>Change Password</legend>
+        <div>
+          <input type="password" placeholder="New password" v-model="password" required />
+          <button type="submit">Update</button>
+        </div>
+      </fieldset>
+    </form>
+  </main>
 </template>
+
+<style scoped>
+main {
+  margin: 0px;
+  width: 35vw;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+fieldset {
+  border: none;
+  width: 100%;
+  padding: 0;
+}
+legend {
+  color: var(--on-secondary);
+  font-weight: bold;
+  font-size: 20px;
+}
+button {
+  background-color: var(--dark-accent);
+  border: 10px var(--dark-accent) solid;
+  border-radius: 33px;
+  font-size: 16px;
+  font-weight: bold;
+  padding-left: 15px;
+  padding-right: 15px;
+  color: var(--on-primary);
+}
+div {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+input {
+  padding: 8px;
+}
+</style>
