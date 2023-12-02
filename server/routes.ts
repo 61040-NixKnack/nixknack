@@ -190,7 +190,7 @@ class Routes {
 
     // Start 7 days ahead
     const d = new Date();
-    d.setDate(d.getDate() + 7);
+    d.setDate(d.getDate() + 6);
     d.setHours(0);
     d.setMinutes(0);
     d.setSeconds(0);
@@ -201,7 +201,7 @@ class Routes {
     minDate.setMinutes(0);
     minDate.setSeconds(0);
 
-    while (d >= minDate && !Plan.getTasksAtDate(user, d)) {
+    while (d >= minDate && !(await Plan.getTasksAtDate(user, d))) {
       await Plan.create(user, d, []); // Figure out the task pool stuff
       d.setDate(d.getDate() - 1);
     }
