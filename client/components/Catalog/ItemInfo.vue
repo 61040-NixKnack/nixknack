@@ -6,9 +6,9 @@ import { fetchy } from "../../utils/fetchy";
 import { formatDateShort } from "../../utils/formatDate";
 
 const props = defineProps(["itemID"]);
-const itemName = ref("NO_NAME");
-const itemDesc = ref("NO_DESC");
-const lastUsed = ref(formatDateShort(new Date()));
+const itemName = ref("");
+const itemDesc = ref("");
+const lastUsed = ref("");
 const itemTags = ref([]);
 
 onBeforeMount(async () => {
@@ -40,7 +40,7 @@ const goBack = async () => {
 </script>
 
 <template>
-  <main>
+  <main v-if="itemName != ''">
     <section id="return">
       <div class="material-symbols-outlined" id="back_arr" @click="goBack"><b>arrow_back</b></div>
       <h1>{{ itemName }}</h1>
@@ -74,6 +74,7 @@ const goBack = async () => {
       <button @click="notImplemented">Discard</button>
     </section>
   </main>
+  <md-circular-progress indeterminate v-else></md-circular-progress>
 </template>
 
 <style scoped>
@@ -84,6 +85,12 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
+}
+
+md-circular-progress {
+  position: fixed;
+  top: 50%;
+  left: 50%;
 }
 
 section {
