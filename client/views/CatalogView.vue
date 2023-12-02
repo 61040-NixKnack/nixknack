@@ -49,7 +49,7 @@ onBeforeMount(reloadCatalog);
         "
       />
     </div>
-c
+
     <button id="new-post-fab" class="material-symbols-outlined" @click="openOverlay = true">add</button>
   </main>
 </template>
