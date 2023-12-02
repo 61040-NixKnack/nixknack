@@ -43,9 +43,9 @@ export default class TagConcept {
     return { msg: `Item ${itemId} successfully added to tags` };
   }
 
-  async deleteItemFromAll(itemId: ObjectId) {
-    await this.tags.removeArrayMany({}, { taggedItems: itemId });
-    return { msg: `Item ${itemId} successfully removed from all tags` };
+  async deleteItemFromAll(itemIds: ObjectId[]) {
+    await this.tags.removeArrayMany({}, { taggedItems: itemIds });
+    return { msg: `Items ${itemIds} successfully removed from all tags` };
   }
 
   async getTags(itemIds: ObjectId[]) {
