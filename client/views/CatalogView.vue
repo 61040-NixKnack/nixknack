@@ -79,9 +79,6 @@ main {
   position: fixed; /* Sit on top of the page content */
 
   z-index: 3;
-  overflow: hidden;
-  /* width: 100%; Full width (cover the whole page) */
-  /* height: 100%; Full height (cover the whole page) */
   bottom: 0;
 }
 
