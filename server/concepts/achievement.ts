@@ -12,6 +12,13 @@ export interface AchievementUserDoc extends BaseDoc {
   progress: number;
 }
 
+export enum AchievementName {
+  CompletedTasks = "tasks",
+  Experience = "exp",
+  ItemsAdded = "added",
+  ItemsDiscarded = "discarded",
+}
+
 export default class AchievementConcept {
   public readonly achieve_types = new DocCollection<AchievementTypeDoc>("achievement_types");
   public readonly user_achieves = new DocCollection<AchievementUserDoc>("user_achievements");
@@ -48,7 +55,7 @@ export default class AchievementConcept {
     return userAchievements;
   }
 
-  async updateAchievement(user: ObjectId, name: string, progress: number) {
+  async progress(user: ObjectId, name: AchievementName, progress: number) {
     await this.user_achieves.updateOne({ user, name }, { progress }, { upsert: true });
     return { msg: `Updated progress of achievement ${name} to ${progress}` };
   }

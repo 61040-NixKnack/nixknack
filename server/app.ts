@@ -1,3 +1,4 @@
+import AchievementConcept from "./concepts/achievement";
 import ItemConcept from "./concepts/item";
 import PlanConcept from "./concepts/plan";
 import PointConcept from "./concepts/point";
@@ -16,3 +17,4 @@ export const Tag = new TagConcept();
 export const Plan = new PlanConcept();
 export const Point = new PointConcept();
 export const Task = new TaskConcept();
+export const Achievement = new AchievementConcept();

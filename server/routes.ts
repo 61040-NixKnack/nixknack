@@ -1,7 +1,8 @@
 import { ObjectId } from "mongodb";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Item, Plan, Point, Recommendation, Tag, Task, User, WebSession } from "./app";
+import { Achievement, Item, Plan, Point, Recommendation, Tag, Task, User, WebSession } from "./app";
+import { AchievementName } from "./concepts/achievement";
 import { ItemDoc } from "./concepts/item";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -168,8 +169,8 @@ class Routes {
       await Tag.deleteItemFromAll([item]);
       await Item.delete({ _id: item });
     }
-    // await Point.addPoints(user, 10);
-    // await Achievement.progress(user, Achievement.NAMES.completedTasks, 1);
+    await Point.addPoints(user, 10);
+    await Achievement.progress(user, AchievementName.CompletedTasks, 1);
   }
 
   @Router.post("/plans")
