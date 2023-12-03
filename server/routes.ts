@@ -182,9 +182,18 @@ class Routes {
     const taskPool = [];
 
     for (const [tag, itm] of itemsByTag) {
-      const rec = await Recommendation.getRecommendation(tag);
+      const recId = (await Recommendation.getRecommendation(tag))._id;
       if (itm.length > ((await Tag.getTagTN(tag)) ?? 0)) {
-        taskPool.push(...itm.map((i) => [user, rec, i])); // TODO: figure out Task pool
+        for (const i of itm) {
+          const maybeTask = await Task.getTasks({ user, rec: recId, item: i });
+          let taskId = undefined;
+          if (maybeTask) {
+            taskId = maybeTask[0];
+          } else {
+            taskId = (await Task.assign(user, recId, i))._id;
+          }
+          taskPool.push(taskId);
+        }
       }
     }
 
@@ -202,7 +211,7 @@ class Routes {
     minDate.setSeconds(0);
 
     while (d >= minDate && !(await Plan.getTasksAtDate(user, d))) {
-      await Plan.create(user, d, []); // Figure out the task pool stuff
+      await Plan.create(user, d, taskPool);
       d.setDate(d.getDate() - 1);
     }
   }
