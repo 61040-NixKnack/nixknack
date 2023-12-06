@@ -11,7 +11,7 @@ export interface TagDoc extends BaseDoc {
 export default class TagConcept {
   public readonly tags = new DocCollection<TagDoc>("tags");
 
-  async create(tag: string, tn: number) {
+  async create(tag: string, tn?: number) {
     await this.uniqueTag(tag);
     await this.tags.createOne({ value: tag, thresholdNumber: tn });
     return { msg: `Tag ${tag} created successfully!` };
@@ -25,7 +25,7 @@ export default class TagConcept {
 
   async addItem(tag: string, itemId: ObjectId) {
     if (!this.doesTagExist(tag)) {
-      await this.create(tag, 20); // Threshold for other items defaulted to 20
+      await this.create(tag, 15); // Threshold for other items defaulted to 20
     }
     await this.itemNotAdded(tag, itemId);
     await this.tags.pushArrayOne({ value: tag }, { taggedItems: itemId });

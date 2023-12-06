@@ -90,9 +90,9 @@ class Routes {
   }
 
   @Router.post("/items")
-  async createItem(session: WebSessionDoc, name: string, lastUsedDate?: Date, location?: string, purpose?: string) {
+  async createItem(session: WebSessionDoc, name: string, lastUsedDate?: Date, location?: string, purpose?: string, image?: string) {
     const user = WebSession.getUser(session);
-    const created = await Item.create(user, name, lastUsedDate, location, purpose);
+    const created = await Item.create(user, name, lastUsedDate, location, purpose, image);
     return { msg: created.msg };
   }
 
@@ -237,6 +237,47 @@ class Routes {
   async getAchievements(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     return await Achievement.getUserAchievements(user);
+  }
+
+  /**
+   * Call once when setting up the app. Sets the threshold values for each tag.
+   */
+  @Router.get("/init")
+  async init() {
+    const arr = [
+      ["Cookware", 5],
+      ["Utensils", 7],
+      ["Kitchen Tools", 6],
+      ["Dishes", 8],
+      ["Glassware", 6],
+      ["Small Appliances", 2],
+      ["Tupperware", 8],
+      ["Tops (Clothing)", 7],
+      ["Bottoms (Clothing)", 6],
+      ["Sweaters, Sweatshirts & Hoodies", 4],
+      ["Coats & Jackets", 2],
+      ["Shoes", 4],
+      ["Jewelry", 10],
+      ["Hats", 3],
+      ["Undergarments", 15],
+      ["Accessories (Clothing)", 8],
+      ["Other (Clothing)", 10],
+      ["Bedding", 3],
+      ["Furniture", 30],
+      ["Electronics", 10],
+      ["Books & Magazines", 20],
+      ["Decor", 15],
+      ["Toiletries", 20],
+      ["Makeup & Skincare", 20],
+      ["Towels", 16],
+      ["Cleaning Supplies", 10],
+      ["Office Supplies", 15],
+      ["Paper", 20],
+      ["Sports Equipment", 5],
+      ["Toys & Games", 15],
+      ["CDs, DVDs & Tapes", 20],
+      ["Hand Tools & Workshop Supplies", 10],
+    ];
   }
 }
 
