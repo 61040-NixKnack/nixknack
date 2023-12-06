@@ -1,14 +1,27 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { defineEmits, defineProps, ref } from "vue";
 
-const query = ref("");
-const emit = defineEmits(["getItemsByQuery"]);
+const props = defineProps(["modelValue"]);
+defineEmits(["update:modelValue"]);
+const internalValue = ref(props.modelValue.value);
 </script>
 
 <template>
   <form class="pure-form">
     <button class="search-button material-symbols-outlined">search</button>
-    <input id="author" type="text" placeholder="Search..." />
+    <input
+      id="input_field"
+      type="text"
+      autocomplete="off"
+      placeholder="Search..."
+      v-model="internalValue"
+      @input="$emit('update:modelValue', internalValue)"
+      @keydown="
+        (event) => {
+          if (event.key == 'Enter') event.preventDefault();
+        }
+      "
+    />
     <button class="search-button material-symbols-outlined">filter_list</button>
   </form>
 </template>
