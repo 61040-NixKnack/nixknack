@@ -170,7 +170,7 @@ class Routes {
       await Item.delete({ _id: item });
     }
     await Point.addPoints(user, 10);
-    await Achievement.progress(user, AchievementName.CompletedTasks, 1);
+    await Achievement.updateProgress(user, AchievementName.CompletedTasks, 1);
   }
 
   @Router.post("/plans")
@@ -231,12 +231,14 @@ class Routes {
   /**
    * Gets the achievements of a user
    * @param session user session ObjectId
-   * @returns a map mapping each achievement to user's highest satisfied level of the achievement
+   * @returns three maps, mapping achievement names to numbers representing the last
+   * completed level of an achievement, the progress toward an achievement, and the closest [lower, upper]
+   * bound thresholds of an achievement, respectively
    */
   @Router.get("/achievements")
-  async getAchievements(session: WebSessionDoc) {
+  async getAchievementData(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
-    return await Achievement.getUserAchievements(user);
+    return await Achievement.getAchievementData(user);
   }
 
   /**
