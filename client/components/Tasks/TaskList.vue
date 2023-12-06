@@ -2,33 +2,19 @@
 import { ref } from "vue";
 
 // Assuming items to get rid of today are stored in userPlan.value[0]
-const userPlan = ref([
-  [
-    ["method", "item"],
-    ["method2", "item2"],
-  ],
-  [["method3", "item3"]],
-  [
-    ["method4", "item4"],
-    ["method5", "item5"],
-    ["method6", "item6"],
-  ],
-  [],
-  [["method7", "item7"]],
-  [],
-  [],
-]);
+const userPlan = ref([["item", "item2"], ["item3"], ["item4", "item5", "item6"], [], ["item7"], [], []]);
 const dateName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const offset = new Date().getDay();
 </script>
+
 <template>
   <main>
     <section v-for="taskInd in 7" :key="taskInd" class="secondary-div">
       <h2>{{ dateName[(taskInd - 1 + offset) % 7] }}</h2>
       <div v-if="userPlan[taskInd - 1].length > 0">
         <div v-for="item in userPlan[taskInd - 1]" :key="item">
-          <p>• <b>Task:</b> {{ item[0] }} to discard {{ item[1] }}</p>
+          <p>• <b>Task:</b> Discard {{ item }}</p>
         </div>
       </div>
       <div v-else>
@@ -37,6 +23,7 @@ const offset = new Date().getDay();
     </section>
   </main>
 </template>
+
 <style scoped>
 main {
   display: flex;
