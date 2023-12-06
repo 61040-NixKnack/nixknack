@@ -277,7 +277,13 @@ class Routes {
       ["Toys & Games", 15],
       ["CDs, DVDs & Tapes", 20],
       ["Hand Tools & Workshop Supplies", 10],
+      ["Sentimental", 0],
+      ["Weaponry", 3],
     ];
+
+    for (const [tag, tn] of arr) {
+      await Tag.create(tag as string, tn as number);
+    }
   }
 }
 
