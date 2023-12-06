@@ -217,11 +217,26 @@ class Routes {
     }
   }
 
-  @Router.patch("/points")
-  async addPointsAchievement(session: WebSessionDoc, quantity: number) {
+  /**
+   * Gets the number of XP points a user has
+   * @param session user session ObjectId
+   * @returns a number representing the points
+   */
+  @Router.get("/points")
+  async getPoints(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
-    await Point.addPoints(user, quantity);
-    // TODO: Add achievement
+    return await Point.getPoints(user);
+  }
+
+  /**
+   * Gets the achievements of a user
+   * @param session user session ObjectId
+   * @returns a map mapping each achievement to user's highest satisfied level of the achievement
+   */
+  @Router.get("/achievements")
+  async getAchievements(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    return await Achievement.getUserAchievements(user);
   }
 }
 
