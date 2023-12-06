@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import "@material/web/button/filled-button.js";
 import "@material/web/textfield/outlined-text-field.js";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 import { formatDateShort } from "../../utils/formatDate";
+import { storage } from "@/utils/firebase.js";
+import { ref as fref, uploadBytes } from "firebase/storage";
+import { v4 } from "uuid";
+
 const name = ref("");
 const lastUsedDate = ref(formatDateShort(new Date()));
 const location = ref("");
 const purpose = ref("");
+const itemPicFile = ref();
+const itemPicURL = computed(() => (itemPicFile.value ? URL.createObjectURL(itemPicFile.value) : ""));
 
 const emit = defineEmits(["closeSheet"]);
 
@@ -18,10 +24,22 @@ const emit = defineEmits(["closeSheet"]);
 // };
 
 const createItem = async (name: string, lastUsedDate: string, location: string, purpose: string) => {
+  let FB_Promise = null;
+  let imgName = "";
+
+  if (itemPicFile.value) {
+    imgName = itemPicFile.value.name + v4();
+    const imageRef = fref(storage, imgName);
+    FB_Promise = uploadBytes(imageRef, itemPicFile.value);
+  }
   try {
-    await fetchy("/api/items", "POST", {
-      body: { name, lastUsedDate, location, purpose },
+    const DB_Promise = fetchy("/api/items", "POST", {
+      body: { name, lastUsedDate, location, purpose, image: FB_Promise ? imgName : null },
     });
+
+    console.log("waiting");
+    await Promise.all([DB_Promise, FB_Promise]);
+    console.log("done!");
 
     emit("closeSheet");
   } catch (_) {
@@ -37,6 +55,16 @@ const emptyForm = () => {
   location.value = "";
   purpose.value = "";
 };
+
+function onInputChange(e: Event) {
+  if (itemPicFile.value) {
+    URL.revokeObjectURL(itemPicURL.value);
+  }
+  if (e.target !== null) {
+    const files = (<HTMLInputElement>e.target).files;
+    if (files) itemPicFile.value = files[0];
+  }
+}
 </script>
 
 <template>
@@ -45,7 +73,17 @@ const emptyForm = () => {
       <div class="creation-form-header">
         <h2 class="hint-text">Add a KnickKnack</h2>
       </div>
-      <img src="@/assets/images/noImage.png" alt="No image" class="default-image" />
+      <div class="image-input">
+        <label for="file-input">
+          <div v-if="itemPicFile">
+            <img :src="itemPicURL" alt="No image" class="default-image" :key="itemPicURL" />
+          </div>
+          <div v-else>
+            <img src="@/assets/images/noImage.png" />
+          </div>
+        </label>
+        <input type="file" accept="image/*" v-on:change="onInputChange" id="file-input" />
+      </div>
       <md-outlined-text-field required v-model="name" label="Name" placeholder="Name"></md-outlined-text-field>
       <md-outlined-text-field pattern="\d{2}/\d{2}/\d{4}" v-model="lastUsedDate" label="Last Used Date" placeholder="mm/dd/yyyy"></md-outlined-text-field>
       <md-outlined-text-field v-model="location" label="Location" placeholder="Location"></md-outlined-text-field>
@@ -104,5 +142,14 @@ form {
   gap: 8px;
   padding: 1em;
   height: 100%;
+}
+
+.image-input > input {
+  display: none;
+}
+
+img {
+  width: 180px;
+  height: 180px;
 }
 </style>

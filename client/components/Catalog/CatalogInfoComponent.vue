@@ -1,12 +1,15 @@
 <script setup lang="ts">
-// import { ref } from "vue";
-
 const props = defineProps(["itemID", "itemUrl", "itemName"]);
 </script>
 
 <template>
   <div class="tile">
-    <img class="item-image" :src="itemUrl" />
+    <div v-if="itemUrl" class="img-div">
+      <img class="item-image" :src="itemUrl" />
+    </div>
+    <div v-else class="img-div">
+      <img class="item-image" src="@/assets/images/noImage.png" />
+    </div>
     <div class="item-name">{{ props.itemName }}</div>
   </div>
 </template>
@@ -32,8 +35,14 @@ const props = defineProps(["itemID", "itemUrl", "itemName"]);
 }
 
 .item-image {
-  width: 80%;
-  height: 80%;
+  margin: 0;
+  padding: 0;
+
+  min-width: 200px;
+  min-height: 200px;
+
+  width: 200px;
+  height: 200px;
 
   max-width: 300px;
   max-height: 300px;
@@ -45,5 +54,13 @@ const props = defineProps(["itemID", "itemUrl", "itemName"]);
 .item-name {
   font-size: 20px;
   font-weight: bold;
+}
+
+.img-div {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
 }
 </style>

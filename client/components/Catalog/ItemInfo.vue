@@ -4,12 +4,15 @@ import { onBeforeMount, ref } from "vue";
 import { useToastStore } from "../../stores/toast";
 import { fetchy } from "../../utils/fetchy";
 import { formatDateShort } from "../../utils/formatDate";
+import { storage } from "@/utils/firebase.js";
+import { ref as fref, getDownloadURL } from "firebase/storage";
 
 const props = defineProps(["itemID"]);
 const itemName = ref("");
 const itemDesc = ref("");
 const lastUsed = ref("");
 const itemTags = ref([]);
+const imageURL = ref("");
 
 onBeforeMount(async () => {
   try {
@@ -17,6 +20,7 @@ onBeforeMount(async () => {
     itemName.value = itemDoc.name;
     itemDesc.value = itemDoc.purpose;
     lastUsed.value = formatDateShort(new Date(itemDoc.lastUsedDate));
+    if (itemDoc.image) imageURL.value = await getDownloadURL(fref(storage, itemDoc.image));
   } catch (error) {
     await router.push({ name: "not-found-page" });
   }
@@ -47,7 +51,12 @@ const goBack = async () => {
     </section>
     <section id="imgSection">
       <div class="secondary-div" id="itemImg">
-        <img src="@/assets/images/noImage.png" />
+        <div v-if="imageURL">
+          <img :src="imageURL" />
+        </div>
+        <div v-else>
+          <img src="@/assets/images/noImage.png" />
+        </div>
       </div>
     </section>
     <section>
@@ -188,5 +197,10 @@ form {
   padding-top: 10px;
   padding-bottom: 10px;
   border-radius: 25px;
+}
+
+img {
+  width: 180px;
+  height: 180px;
 }
 </style>

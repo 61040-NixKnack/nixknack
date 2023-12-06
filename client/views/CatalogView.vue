@@ -7,6 +7,8 @@ import "@material/web/progress/circular-progress.js";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../utils/fetchy";
+import { storage } from "@/utils/firebase.js";
+import { ref as fref, getDownloadURL } from "firebase/storage";
 
 type CatalogInfoType = { itemId: string; itemName: string; itemUrl: string };
 
@@ -14,11 +16,18 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 const openOverlay = ref(false);
 let itemData = ref<CatalogInfoType[]>();
 
+const loadFirebase = async (imgURL: string | null) => {
+  if (imgURL !== null) return await getDownloadURL(fref(storage, imgURL));
+  return "";
+};
+
 const reloadCatalog = async () => {
   const response = await fetchy("/api/items", "GET");
-  itemData.value = response.map((item: { _id: string; name: string; image: string }) => {
-    return { itemId: item._id, itemName: item.name, itemUrl: item.image ?? "../client/assets/images/noImage.png" };
-  });
+  itemData.value = await Promise.all(
+    response.map(async (item: { _id: string; name: string; image: string }) => {
+      return { itemId: item._id, itemName: item.name, itemUrl: await loadFirebase(item.image) };
+    }),
+  );
 };
 
 onBeforeMount(reloadCatalog);
