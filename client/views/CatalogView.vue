@@ -25,7 +25,7 @@ const reloadCatalog = async () => {
   const response = await fetchy("/api/items", "GET");
   itemData.value = await Promise.all(
     response.map(async (item: { _id: string; name: string; image: string }) => {
-      return { itemId: item._id, itemName: item.name, itemUrl: await loadFirebase(item.image) };
+      return { itemId: item._id, itemName: item.name, itemUrl: item.image ? await loadFirebase(item.image) : "" };
     }),
   );
 };
