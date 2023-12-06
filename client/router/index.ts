@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
 import CatalogView from "../views/CatalogView.vue";
-import HomeView from "../views/HomeView.vue";
+import TasksView from "../views/TasksView.vue";
 import ItemView from "../views/ItemView.vue";
 import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
@@ -43,7 +43,7 @@ const router = createRouter({
     {
       path: "/tasks",
       name: "Tasks",
-      component: HomeView, // TODO: change to tasks view
+      component: TasksView, // TODO: change to tasks view
       meta: { requiresAuth: true },
     },
     {

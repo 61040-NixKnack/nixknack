@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import PlanList from "@/components/Plan/PlanList.vue";
+import TaskList from "@/components/Tasks/TaskList.vue";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 </script>
@@ -9,12 +9,13 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 <template>
   <main>
     <h1>Your Plan</h1>
-    <PlanList />
+    <TaskList />
   </main>
 </template>
 
 <style scoped>
 h1 {
   text-align: center;
+  color: var(--on-primary);
 }
 </style>
