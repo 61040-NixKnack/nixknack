@@ -71,7 +71,7 @@ class Routes {
   async getItems(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     const items = await Item.getItems({ owner: user });
-    return items.map((item) => ({ ...item, name: item.name, id: item._id }));
+    return items.map((item) => ({ ...item, name: item.name, id: item._id, image: item.image }));
   }
 
   /**
@@ -86,7 +86,7 @@ class Routes {
     const item = await Item.getItem(id);
     const tags = await Tag.getTags([id]);
     await Item.isOwner(user, id);
-    return { owner: item?.owner, name: item?.name, lastUsedDate: item?.lastUsedDate, location: item?.location, purpose: item?.purpose, tags: tags };
+    return { owner: item?.owner, name: item?.name, lastUsedDate: item?.lastUsedDate, location: item?.location, purpose: item?.purpose, image: item?.image, tags: tags };
   }
 
   @Router.post("/items")

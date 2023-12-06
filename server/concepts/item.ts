@@ -8,16 +8,17 @@ export interface ItemDoc extends BaseDoc {
   lastUsedDate: Date;
   location: string;
   purpose: string;
+  image: string;
 }
 
 export default class ItemConcept {
   public readonly items = new DocCollection<ItemDoc>("items");
 
-  async create(owner: ObjectId, name: string, lastUsedDate?: Date, location?: string, purpose?: string) {
+  async create(owner: ObjectId, name: string, lastUsedDate?: Date, location?: string, purpose?: string, image?: string) {
     if (!lastUsedDate) {
       lastUsedDate = new Date();
     }
-    const id = await this.items.createOne({ owner, name, lastUsedDate, location, purpose });
+    const id = await this.items.createOne({ owner, name, lastUsedDate, location, purpose, image });
     return { msg: "Item created successfully!", id: id };
   }
 
