@@ -44,6 +44,10 @@ export default class AchievementConcept {
     return await this.achieve_types.readMany({});
   }
 
+  async create(name: string, thresholds: Array<number>) {
+    await this.achieve_types.createOne({ name, thresholds });
+  }
+
   async getAchievementData(user: ObjectId) {
     const achievementTypes = await this.achieve_types.readMany({});
 

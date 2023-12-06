@@ -286,6 +286,17 @@ class Routes {
     for (const [tag, tn] of arr) {
       await Tag.create(tag as string, tn as number);
     }
+
+    const achievements = [
+      ["exp", [0, 50, 100, 250, 500, 1000, 2000, 3000, 5000, 7500, 10000]],
+      ["added", [0, 1, 5, 10, 20, 50, 100, 200, 500, 1000]],
+      ["discarded", [0, 1, 5, 10, 20, 50, 100, 200, 500]],
+      ["tasks", [0, 5, 20, 50, 100, 250, 500, 1000, 2000, 4000]],
+    ];
+
+    for (const [name, thresholds] of achievements) {
+      await Achievement.create(name as string, thresholds as Array<number>);
+    }
   }
 }
 
