@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
+import { NotFoundError } from "./errors";
 
 export interface AchievementTypeDoc extends BaseDoc {
   name: string;
@@ -10,6 +11,7 @@ export interface AchievementUserDoc extends BaseDoc {
   user: ObjectId;
   name: string;
   progress: number;
+  level: number;
 }
 
 export enum AchievementName {
@@ -42,21 +44,39 @@ export default class AchievementConcept {
     return await this.achieve_types.readMany({});
   }
 
-  async getUserAchievements(user: ObjectId) {
-    const allAchievements = await this.getAllAchievements();
-    const userAchievements: Map<string, number> = new Map();
+  async getAchievementData(user: ObjectId) {
+    const achievementTypes = await this.achieve_types.readMany({});
 
-    for (const a of allAchievements) {
-      const userProgress = (await this.user_achieves.readOne({ user, name: a.name }))?.progress ?? 0;
-      const userAchievementLevel = this.findMaxAchievementLevel(userProgress, a.thresholds);
-      userAchievements.set(a.name, userAchievementLevel);
+    const levelMap: Map<string, number> = new Map();
+    const progressMap: Map<string, number> = new Map();
+    const thresholdsMap: Map<string, [number, number]> = new Map();
+
+    for (const a of achievementTypes) {
+      const userAchievement = await this.user_achieves.readOne({ user, name: a.name });
+
+      let level = 0;
+      if (userAchievement) {
+        level = userAchievement.level;
+      }
+
+      levelMap.set(a.name, level);
+      progressMap.set(a.name, userAchievement?.progress ?? 0);
+      thresholdsMap.set(a.name, [a.thresholds[level], a.thresholds[level + 1]]);
     }
 
-    return userAchievements;
+    return [levelMap, progressMap, thresholdsMap];
   }
 
-  async progress(user: ObjectId, name: AchievementName, progress: number) {
-    await this.user_achieves.updateOne({ user, name }, { progress }, { upsert: true });
-    return { msg: `Updated progress of achievement ${name} to ${progress}` };
+  async updateProgress(user: ObjectId, name: AchievementName, progress: number) {
+    const achievementObj = await this.achieve_types.readOne({ name });
+
+    if (!achievementObj) {
+      throw new NotFoundError(`Achievement with name ${name} does not exist`);
+    }
+
+    const level = this.findMaxAchievementLevel(progress, achievementObj.thresholds);
+    await this.user_achieves.updateOne({ user, name }, { progress, level }, { upsert: true });
+
+    return { msg: `Updated progress of achievement ${name} to level ${level} with progress ${progress}` };
   }
 }
