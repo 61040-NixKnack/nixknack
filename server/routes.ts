@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { Router, getExpressRouter } from "./framework/router";
 
 import { Achievement, Item, Plan, Point, Recommendation, Tag, Task, User, WebSession } from "./app";
+import { AchievementName } from "./concepts/achievement";
 import { ItemDoc } from "./concepts/item";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -169,7 +170,7 @@ class Routes {
       await Item.delete({ _id: item });
     }
     await Point.addPoints(user, 10);
-    await Achievement.updateProgress(user, "tasks", 1);
+    await Achievement.updateProgress(user, AchievementName.CompletedTasks, 1);
   }
 
   @Router.post("/plans")
@@ -235,7 +236,7 @@ class Routes {
    * bound thresholds of an achievement, respectively
    */
   @Router.get("/achievements")
-  async getAchievementLevel(session: WebSessionDoc) {
+  async getAchievementData(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     return await Achievement.getAchievementData(user);
   }
