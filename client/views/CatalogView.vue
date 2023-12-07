@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import AddItemForm from "@/components/AddItem/AddItemForm.vue";
+import ItemForm from "@/components/ItemForm/ItemForm.vue";
 import CatalogInfoComponent from "@/components/Catalog/CatalogInfoComponent.vue";
 import SearchBarComponent from "@/components/SearchBar/SearchBarComponent.vue";
 import { useUserStore } from "@/stores/user";
+import { storage } from "@/utils/firebase.js";
 import "@material/web/progress/circular-progress.js";
+import { ref as fref, getDownloadURL } from "firebase/storage";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../utils/fetchy";
@@ -12,13 +14,21 @@ type CatalogInfoType = { itemId: string; itemName: string; itemUrl: string };
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 const openOverlay = ref(false);
+const query = ref<string>("");
 let itemData = ref<CatalogInfoType[]>();
+
+const loadFirebase = async (imgURL: string | null) => {
+  if (imgURL !== null) return await getDownloadURL(fref(storage, imgURL));
+  return "";
+};
 
 const reloadCatalog = async () => {
   const response = await fetchy("/api/items", "GET");
-  itemData.value = response.map((item: { _id: string; name: string; image: string }) => {
-    return { itemId: item._id, itemName: item.name, itemUrl: item.image ?? "../client/assets/images/noImage.png" };
-  });
+  itemData.value = await Promise.all(
+    response.map(async (item: { _id: string; name: string; image: string }) => {
+      return { itemId: item._id, itemName: item.name, itemUrl: item.image ? await loadFirebase(item.image) : "" };
+    }),
+  );
 };
 
 onBeforeMount(reloadCatalog);
@@ -28,10 +38,10 @@ onBeforeMount(reloadCatalog);
   <main>
     <h1>Your KnickKnacks</h1>
     <div class="catalog-content">
-      <SearchBarComponent />
+      <SearchBarComponent v-model="query" />
       <div class="item-list" v-if="itemData">
         <CatalogInfoComponent
-          v-for="item in itemData"
+          v-for="item in itemData?.filter((item) => item.itemName.toLowerCase().startsWith(query.toLowerCase()))"
           :key="item.itemId"
           :itemName="item.itemName"
           :itemUrl="item.itemUrl"
@@ -43,7 +53,7 @@ onBeforeMount(reloadCatalog);
 
     <div class="overlay" v-if="openOverlay">
       <div class="shade" @click="openOverlay = false"></div>
-      <AddItemForm
+      <ItemForm
         class="add-item-form"
         @closeSheet="
           openOverlay = false;

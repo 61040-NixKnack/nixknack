@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import ItemForm from "@/components/ItemForm/ItemForm.vue";
 import router from "@/router/index";
+import { storage } from "@/utils/firebase.js";
+import { ref as fref, getDownloadURL } from "firebase/storage";
 import { onBeforeMount, ref } from "vue";
 import { useToastStore } from "../../stores/toast";
 import { fetchy } from "../../utils/fetchy";
@@ -10,6 +13,8 @@ const itemName = ref("");
 const itemDesc = ref("");
 const lastUsed = ref("");
 const itemTags = ref([]);
+const imageURL = ref("");
+const openOverlay = ref(false);
 
 onBeforeMount(async () => {
   try {
@@ -17,6 +22,7 @@ onBeforeMount(async () => {
     itemName.value = itemDoc.name;
     itemDesc.value = itemDoc.purpose;
     lastUsed.value = formatDateShort(new Date(itemDoc.lastUsedDate));
+    if (itemDoc.image) imageURL.value = await getDownloadURL(fref(storage, itemDoc.image));
   } catch (error) {
     await router.push({ name: "not-found-page" });
   }
@@ -26,17 +32,14 @@ const notImplemented = async () => {
   useToastStore().showToast({ message: "NOT IMPLEMENTED", style: "error" });
 };
 
+const reloadItem = async () => {
+  // TODO
+};
+
 const goBack = async () => {
   await router.push({ name: "Catalog" });
 };
 
-// TODO
-// Function to make a fake item
-// const makeFake = async () => {
-//   await fetchy("/api/items", "POST", {
-//     body: { name: "Test Item", purpose: "This is a test description. Real descriptions are more helpful. Just padding this out to be a bit longer", lastUsedDate: new Date().toString() },
-//   });
-// };
 </script>
 
 <template>
@@ -47,7 +50,12 @@ const goBack = async () => {
     </section>
     <section id="imgSection">
       <div class="secondary-div" id="itemImg">
-        <img src="@/assets/images/noImage.png" />
+        <div v-if="imageURL">
+          <img :src="imageURL" />
+        </div>
+        <div v-else>
+          <img src="@/assets/images/noImage.png" />
+        </div>
       </div>
     </section>
     <section>
@@ -70,11 +78,23 @@ const goBack = async () => {
     </section>
     <section id="options">
       <!-- TODO -->
-      <button @click="notImplemented">Edit</button>
+      <button @click="openOverlay = true">Edit</button>
       <button @click="notImplemented">Discard</button>
     </section>
   </main>
   <md-circular-progress indeterminate v-else></md-circular-progress>
+
+  <div class="overlay" v-if="openOverlay">
+    <div class="shade" @click="openOverlay = false"></div>
+    <ItemForm
+      class="add-item-form"
+      @closeSheet="
+        openOverlay = false;
+        reloadItem();
+      "
+      :itemID="props.itemID"
+    />
+  </div>
 </template>
 
 <style scoped>
@@ -188,5 +208,31 @@ form {
   padding-top: 10px;
   padding-bottom: 10px;
   border-radius: 25px;
+}
+
+img {
+  width: 180px;
+  height: 180px;
+}
+
+.shade {
+  overflow: hidden;
+  position: fixed; /* Sit on top of the page content */
+  display: flex;
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+}
+
+.add-item-form {
+  position: fixed; /* Sit on top of the page content */
+
+  z-index: 3;
+  bottom: 0;
 }
 </style>
