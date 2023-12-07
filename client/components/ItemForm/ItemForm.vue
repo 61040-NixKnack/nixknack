@@ -15,7 +15,7 @@ const lastUsedDate = ref(formatDateShort(new Date()));
 const location = ref("");
 const purpose = ref("");
 const itemPicFile = ref();
-const itemPicURL = "";
+const itemPicURL = ref("");
 
 const emit = defineEmits(["closeSheet"]);
 
