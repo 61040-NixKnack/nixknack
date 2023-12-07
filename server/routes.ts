@@ -4,6 +4,7 @@ import { Router, getExpressRouter } from "./framework/router";
 import { Achievement, Item, Plan, Point, Recommendation, Tag, Task, User, WebSession } from "./app";
 import { AchievementName } from "./concepts/achievement";
 import { ItemDoc } from "./concepts/item";
+import { TaskDoc } from "./concepts/task";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 
@@ -159,7 +160,7 @@ class Routes {
     return rec; // # To Do: Fix Responses, what type of information does front end want?
   }
 
-  @Router.get("/task/:_id")
+  @Router.delete("/task/:_id")
   async completeTask(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
     const id = new ObjectId(_id);
@@ -186,7 +187,7 @@ class Routes {
       const recId = (await Recommendation.getRecommendation(tag))._id;
       if (itm.length > ((await Tag.getTagTN(tag)) ?? 0)) {
         for (const i of itm) {
-          const maybeTask = await Task.getTasks({ user, rec: recId, item: i });
+          const maybeTask = await Task.getTasks({ user, rec: recId, item: i }, true);
           let taskId = undefined;
           if (maybeTask) {
             taskId = maybeTask[0];
@@ -199,22 +200,37 @@ class Routes {
     }
 
     // Start 7 days ahead
-    const d = new Date();
+    let d = new Date();
+    d = Plan.normalizeDate(d);
     d.setDate(d.getDate() + 6);
-    d.setHours(0);
-    d.setMinutes(0);
-    d.setSeconds(0);
 
     // Current date
-    const minDate = new Date();
-    minDate.setHours(0);
-    minDate.setMinutes(0);
-    minDate.setSeconds(0);
+    let minDate = new Date();
+    minDate = Plan.normalizeDate(minDate);
 
     while (d >= minDate && !(await Plan.getTasksAtDate(user, d))) {
-      await Plan.create(user, d, taskPool);
+      await Plan.create(user, d, taskPool as ObjectId[]);
       d.setDate(d.getDate() - 1);
     }
+  }
+
+  @Router.get("/plans")
+  async getPlan(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const plan = new Array<Array<TaskDoc>>();
+
+    // Current date
+    let curDate = new Date();
+    curDate = Plan.normalizeDate(curDate);
+
+    // Get the Plan for today and the next 6 days
+    for (let i = 0; i < 7; i++) {
+      const taskIDs = await Plan.getTasksAtDate(user, curDate);
+      plan.push((await Task.getTasks({ _id: { $in: taskIDs } }, false)) as TaskDoc[]);
+      curDate.setDate(curDate.getDate() + 1);
+    }
+
+    return plan;
   }
 
   /**

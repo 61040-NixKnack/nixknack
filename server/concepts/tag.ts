@@ -25,7 +25,7 @@ export default class TagConcept {
 
   async addItem(tag: string, itemId: ObjectId) {
     if (!this.doesTagExist(tag)) {
-      await this.create(tag, 15); // Threshold for other items defaulted to 20
+      await this.create(tag, 15); // Threshold for other items defaulted to 15
     }
     await this.itemNotAdded(tag, itemId);
     await this.tags.pushArrayOne({ value: tag }, { taggedItems: itemId });

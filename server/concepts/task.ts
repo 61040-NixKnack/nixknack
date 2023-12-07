@@ -31,9 +31,17 @@ export default class TaskConcept {
     }
   }
 
-  async getTasks(query: Filter<TaskDoc>) {
+  /**
+   * @param query MongoDB query
+   * @param id if true only return task ids
+   * @returns array of tasks that satisfy query
+   */
+  async getTasks(query: Filter<TaskDoc>, id: boolean) {
     const tasks = await this.tasks.readMany(query);
-    return tasks.map((task) => task._id);
+    if (id) {
+      return tasks.map((task) => task._id);
+    }
+    return tasks;
   }
 
   async deleteAll(query: Filter<TaskDoc>) {

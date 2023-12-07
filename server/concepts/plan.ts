@@ -21,7 +21,7 @@ export default class PlanConcept {
     return res;
   }
 
-  private normalizeDate(date: Date) {
+  public normalizeDate(date: Date) {
     const dateCopy = new Date(date.getTime());
     dateCopy.setHours(0);
     dateCopy.setMinutes(0);
