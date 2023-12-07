@@ -2,7 +2,7 @@
 import { storage } from "@/utils/firebase.js";
 import "@material/web/button/filled-button.js";
 import "@material/web/textfield/outlined-text-field.js";
-import { ref as fref, uploadBytes } from "firebase/storage";
+import { ref as fref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
 import { computed, ref, onBeforeMount } from "vue";
 import { fetchy } from "../../utils/fetchy";
@@ -119,7 +119,8 @@ onBeforeMount(async () => {
     <form @submit.prevent="submitForm(name, lastUsedDate, location, purpose)">
       <div class="creation-form-header">
         <div class="close-button material-symbols-outlined" @click="emit('closeSheet')">close</div>
-        <h2 class="hint-text">Add a KnickKnack</h2>
+        <h2 class="hint-text" v-if="isEditing">Edit your KnickKnack</h2>
+        <h2 class="hint-text" v-else>Add a KnickKnack</h2>
       </div>
       <div class="image-input">
         <label for="file-input">
