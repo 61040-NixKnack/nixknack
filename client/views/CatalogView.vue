@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AddItemForm from "@/components/AddItem/AddItemForm.vue";
+import ItemForm from "@/components/ItemForm/ItemForm.vue";
 import CatalogInfoComponent from "@/components/Catalog/CatalogInfoComponent.vue";
 import SearchBarComponent from "@/components/SearchBar/SearchBarComponent.vue";
 import { useUserStore } from "@/stores/user";
@@ -53,7 +53,7 @@ onBeforeMount(reloadCatalog);
 
     <div class="overlay" v-if="openOverlay">
       <div class="shade" @click="openOverlay = false"></div>
-      <AddItemForm
+      <ItemForm
         class="add-item-form"
         @closeSheet="
           openOverlay = false;

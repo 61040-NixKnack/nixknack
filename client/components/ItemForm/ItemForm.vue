@@ -1,19 +1,21 @@
 <script setup lang="ts">
+import { storage } from "@/utils/firebase.js";
 import "@material/web/button/filled-button.js";
 import "@material/web/textfield/outlined-text-field.js";
-import { computed, ref } from "vue";
+import { ref as fref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 } from "uuid";
+import { onBeforeMount, computed, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 import { formatDateShort } from "../../utils/formatDate";
-import { storage } from "@/utils/firebase.js";
-import { ref as fref, uploadBytes } from "firebase/storage";
-import { v4 } from "uuid";
 
+const props = defineProps(["itemID"]);
+const isEditing = computed(() => props.itemID !== undefined);
 const name = ref("");
 const lastUsedDate = ref(formatDateShort(new Date()));
 const location = ref("");
 const purpose = ref("");
 const itemPicFile = ref();
-const itemPicURL = computed(() => (itemPicFile.value ? URL.createObjectURL(itemPicFile.value) : ""));
+const itemPicURL = "";
 
 const emit = defineEmits(["closeSheet"]);
 
@@ -22,6 +24,14 @@ const emit = defineEmits(["closeSheet"]);
 //     body: { name: "Test Item", purpose: "This is a test description. Real descriptions are more helpful. Just padding this out to be a bit longer", lastUsedDate: new Date().toString() },
 //   });
 // };
+
+const submitForm = async (name: string, lastUsedDate: string, location: string, purpose: string) => {
+  if (isEditing.value) {
+    await updateItem(name, lastUsedDate, location, purpose);
+  } else {
+    await createItem(name, lastUsedDate, location, purpose);
+  }
+};
 
 const createItem = async (name: string, lastUsedDate: string, location: string, purpose: string) => {
   let FB_Promise = null;
@@ -34,6 +44,31 @@ const createItem = async (name: string, lastUsedDate: string, location: string, 
   }
   try {
     const DB_Promise = fetchy("/api/items", "POST", {
+      body: { name, lastUsedDate, location, purpose, image: FB_Promise ? imgName : null },
+    });
+
+    console.log("waiting");
+    await Promise.all([DB_Promise, FB_Promise]);
+    console.log("done!");
+
+    emit("closeSheet");
+  } catch (_) {
+    return;
+  }
+};
+
+const updateItem = async (name: string, lastUsedDate: string, location: string, purpose: string) => {
+  let FB_Promise = null;
+  let imgName = "";
+
+  if (itemPicFile.value) {
+    imgName = itemPicFile.value.name + v4();
+    const imageRef = fref(storage, imgName);
+    FB_Promise = uploadBytes(imageRef, itemPicFile.value);
+  }
+
+  try {
+    const DB_Promise = await fetchy(`/api/items/${props.itemID}`, "PATCH", {
       body: { name, lastUsedDate, location, purpose, image: FB_Promise ? imgName : null },
     });
 
@@ -65,11 +100,23 @@ function onInputChange(e: Event) {
     if (files) itemPicFile.value = files[0];
   }
 }
+
+onBeforeMount(async () => {
+  if (isEditing.value) {
+    const itemDoc = await fetchy(`/api/items/${props.itemID}`, "GET");
+    console.log(itemDoc);
+    name.value = itemDoc.name;
+    purpose.value = itemDoc.purpose;
+    location.value = itemDoc.location;
+    lastUsedDate.value = formatDateShort(new Date(itemDoc.lastUsedDate));
+    if (itemDoc.image) itemPicFile.value = await getDownloadURL(fref(storage, itemDoc.image));
+  }
+});
 </script>
 
 <template>
   <div class="creation-form">
-    <form @submit.prevent="createItem(name, lastUsedDate, location, purpose)">
+    <form @submit.prevent="submitForm(name, lastUsedDate, location, purpose)">
       <div class="creation-form-header">
         <h2 class="hint-text">Add a KnickKnack</h2>
       </div>
