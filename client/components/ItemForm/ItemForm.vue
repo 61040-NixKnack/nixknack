@@ -2,9 +2,9 @@
 import { storage } from "@/utils/firebase.js";
 import "@material/web/button/filled-button.js";
 import "@material/web/textfield/outlined-text-field.js";
-import { ref as fref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref as fref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
-import { onBeforeMount, computed, ref } from "vue";
+import { computed, ref, onBeforeMount } from "vue";
 import { fetchy } from "../../utils/fetchy";
 import { formatDateShort } from "../../utils/formatDate";
 
@@ -118,6 +118,7 @@ onBeforeMount(async () => {
   <div class="creation-form">
     <form @submit.prevent="submitForm(name, lastUsedDate, location, purpose)">
       <div class="creation-form-header">
+        <div class="close-button material-symbols-outlined" @click="emit('closeSheet')">close</div>
         <h2 class="hint-text">Add a KnickKnack</h2>
       </div>
       <div class="image-input">
@@ -135,12 +136,27 @@ onBeforeMount(async () => {
       <md-outlined-text-field pattern="\d{2}/\d{2}/\d{4}" v-model="lastUsedDate" label="Last Used Date" placeholder="mm/dd/yyyy"></md-outlined-text-field>
       <md-outlined-text-field v-model="location" label="Location" placeholder="Location"></md-outlined-text-field>
       <md-outlined-text-field v-model="purpose" label="Description" type="textarea" placeholder="Description" rows="3" class="description-field"></md-outlined-text-field>
-      <md-filled-button type="submit" class="submit-button">Add</md-filled-button>
+
+      <div class="button-group">
+        <md-filled-button v-if="isEditing" type="button" class="submit-button">Discard</md-filled-button><md-filled-button type="submit" class="submit-button">Add</md-filled-button>
+      </div>
     </form>
   </div>
 </template>
 
 <style scoped>
+.button-group {
+  margin: 16px auto;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: space-between;
+}
+
+.close-button {
+  align-self: flex-start;
+}
+
 .creation-form {
   position: absolute;
   left: 50%;
@@ -169,15 +185,10 @@ md-outlined-text-field {
 
 .creation-form-header {
   display: flex;
-  /* flex-direction: row; */
-  /* align-items: flex-start; */
-  /* float: left; */
-  /* gap: 0vw; */
-  /* background-color: pink; */
-}
-
-.hint-text {
-  align-self: flex-start;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
 }
 
 form {
