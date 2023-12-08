@@ -149,7 +149,7 @@ const addTag = () => {
   const selectionBox = document.querySelector("md-outlined-select");
   const selectedItem = Array.from(document.querySelectorAll("md-select-option")).filter((tag) => tag.selected)[0];
   chosenTags.value.push(selectedItem.value);
-  selectionBox.reset();
+  selectionBox!.reset();
 };
 
 const checkDeleted = (tag: string) => {
