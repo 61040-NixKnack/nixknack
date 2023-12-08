@@ -26,6 +26,7 @@ export default class PlanConcept {
     dateCopy.setHours(0);
     dateCopy.setMinutes(0);
     dateCopy.setSeconds(0);
+    dateCopy.setMilliseconds(0);
     return dateCopy;
   }
 
@@ -57,11 +58,10 @@ export default class PlanConcept {
     d = this.normalizeDate(d);
     d.setDate(d.getDate() + 6);
 
-    // Current date
-    let minDate = new Date();
-    minDate = this.normalizeDate(minDate);
-
-    while (d >= minDate && (await this.getTasksAtDate(user, d)).length === 0) {
+    for (let i = 6; i >= 0; i--) {
+      if ((await this.getTasksAtDate(user, d)).length !== 0) {
+        break;
+      }
       await this.create(user, d, taskPool as ObjectId[]);
       d.setDate(d.getDate() - 1);
     }
