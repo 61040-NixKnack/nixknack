@@ -48,7 +48,7 @@ export default class ItemConcept {
   async itemExists(_id: ObjectId) {
     const maybeItem = await this.items.readOne({ _id });
     if (maybeItem === null) {
-      throw new NotFoundError(`Item not found!`);
+      throw new NotFoundError(`Item with id ${_id} not found!`);
     }
   }
 

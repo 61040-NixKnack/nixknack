@@ -11,9 +11,8 @@ import {
   FindOptions,
   ObjectId,
   OptionalUnlessRequiredId,
-  PullOperator,
-  PushOperator,
   ReplaceOptions,
+  UpdateFilter,
   UpdateResult,
   WithId,
   WithoutId,
@@ -118,35 +117,19 @@ export default class DocCollection<Schema extends BaseDoc> {
   }
 
   /**
-   * Add to an array field of a document that matches `filter` based on options.
-   */
-  async pushArrayOne(filter: Filter<Schema>, update: PushOperator<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
-    this.sanitizeFilter(filter);
-    return await this.collection.updateOne(filter, { $push: update }, options);
-  }
-
-  /**
-   * Add to an array field of documents that matches `filter` based on options.
-   */
-  async pushArrayMany(filter: Filter<Schema>, update: PushOperator<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
-    this.sanitizeFilter(filter);
-    return await this.collection.updateMany(filter, { $push: update }, options);
-  }
-
-  /**
    * Remove from an array field of a document that matches `filter` based on options.
    */
-  async removeArrayOne(filter: Filter<Schema>, update: PullOperator<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
+  async updateArrayOne(filter: Filter<Schema>, update: UpdateFilter<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
     this.sanitizeFilter(filter);
-    return await this.collection.updateOne(filter, { $pull: update }, options);
+    return await this.collection.updateOne(filter, update, options);
   }
 
   /**
    * Remove from an array field of documents that matches `filter` based on options.
    */
-  async removeArrayMany(filter: Filter<Schema>, update: PullOperator<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
+  async updateArrayMany(filter: Filter<Schema>, update: UpdateFilter<Schema>, options?: FindOneAndUpdateOptions): Promise<UpdateResult<Schema>> {
     this.sanitizeFilter(filter);
-    return await this.collection.updateMany(filter, { $pull: update }, options);
+    return await this.collection.updateMany(filter, update, options);
   }
 
   /**

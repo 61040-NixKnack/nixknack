@@ -33,13 +33,12 @@ export default class PlanConcept {
   async getWeekTasks(user: ObjectId) {
     const date = new Date();
     const deadline = this.normalizeDate(date);
-    const tasks = new Array<Promise<PlanDoc | null>>();
+    const plan = new Array<PlanDoc | null>();
     for (let i = 0; i < 7; i++) {
-      tasks.push(this.plans.readOne({ user, deadline }));
+      plan.push(await this.plans.readOne({ user: user, deadline: deadline }));
       deadline.setDate(deadline.getDate() + 1);
     }
-    const plan = await Promise.all(tasks);
-    return plan.map((item) => (item ? item.tasks : []));
+    return plan.map((item) => (item !== null ? item.tasks : []));
   }
 
   async getTasksAtDate(user: ObjectId, deadline: Date) {
@@ -60,6 +59,7 @@ export default class PlanConcept {
 
     for (let i = 6; i >= 0; i--) {
       if ((await this.getTasksAtDate(user, d)).length > 0) {
+        console.log("Exist");
         break;
       }
       await this.create(user, d, taskPool);

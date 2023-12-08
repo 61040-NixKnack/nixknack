@@ -196,28 +196,32 @@ class Routes {
   async generatePlan(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     const items = (await Item.getItems({ owner: user })).map((item) => item._id);
+    console.log(items);
     const userTags = await Tag.getTags(items);
     const itemsByTag = await Tag.itemsByTag(userTags, items);
-
     const taskPool: ObjectId[] = [];
-
+    console.log(itemsByTag);
     for (const [tag, itm] of itemsByTag) {
       // Pass tags into Recommendation in bulk and mapping for tag and recId
-      const recId = (await Recommendation.getRecommendation(tag))._id;
+      const rec = (await Recommendation.getRecommendation(tag)).text;
       // Add this to Tag
       if (itm.length > ((await Tag.getTagTN(tag)) ?? 0)) {
         // Add this into Task and have it return taskPool
         for (const i of itm) {
-          const maybeTask = await Task.getTasks({ user, rec: recId, item: i }, true);
-          if (maybeTask) {
+          console.log(i);
+          const maybeTask = await Task.getTasks({ assignee: user, objective: rec, item: i }, true);
+          console.log(maybeTask);
+          if (maybeTask.length !== 0) {
+            console.log("Already");
             taskPool.push(maybeTask[0] as ObjectId);
+            console.log(taskPool);
           } else {
-            taskPool.push((await Task.assign(user, recId, i))._id);
+            console.log("assign");
+            taskPool.push((await Task.assign(user, rec, i))._id);
           }
         }
       }
     }
-
     await Plan.populateWeekTasks(user, taskPool);
     return { msg: "Success" };
   }
@@ -227,7 +231,18 @@ class Routes {
     const user = WebSession.getUser(session);
     const taskIds = await Plan.getWeekTasks(user);
     const plan = await Task.getArrayTasks(taskIds);
-    return plan;
+    console.log(plan);
+    const readable = Array<Array<ReadableTaskDoc>>();
+    for (const date of plan) {
+      const tasks = new Array<ReadableTaskDoc>();
+      for (const task of date) {
+        tasks.push({ objective: task.objective, assignee: task.assignee, item: await Item.getItem(task.item) });
+      }
+      readable.push(tasks);
+    }
+    console.log("get");
+    console.log(readable);
+    return readable;
   }
 
   @Router.get("/tags")
@@ -263,6 +278,12 @@ class Routes {
     const user = WebSession.getUser(session);
     return await Achievement.getAchievementData(user);
   }
+}
+
+interface ReadableTaskDoc {
+  objective: string;
+  assignee: ObjectId;
+  item: ItemDoc | null;
 }
 
 export default getExpressRouter(new Routes());

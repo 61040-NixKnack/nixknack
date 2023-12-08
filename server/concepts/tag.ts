@@ -64,23 +64,23 @@ export default class TagConcept {
       await this.create(tag, 15); // Threshold for other items defaulted to 15
     }
     await this.itemNotAdded(tag, itemId);
-    await this.tags.pushArrayOne({ value: tag }, { taggedItems: itemId });
+    await this.tags.updateArrayOne({ value: tag }, { $push: { taggedItems: itemId } });
     return { msg: `Item ${itemId} added for tag ${tag}!` };
   }
 
   async deleteItem(tag: string, itemId: ObjectId) {
     await this.itemAdded(tag, itemId);
-    await this.tags.removeArrayOne({ value: tag }, { taggedItems: itemId });
+    await this.tags.updateArrayOne({ value: tag }, { $pull: { $taggedItems: { $in: itemId } } });
     return { msg: `Item ${itemId} deleted for tag ${tag}!` };
   }
 
   async addItemToTags(tags: string[], itemId: ObjectId) {
-    await this.tags.pushArrayMany({ value: { $in: tags } }, { taggedItems: itemId });
+    await this.tags.updateArrayMany({ value: { $in: tags } }, { $push: { taggedItems: itemId } });
     return { msg: `Item ${itemId} successfully added to tags` };
   }
 
   async deleteItemFromAll(itemIds: ObjectId[]) {
-    await this.tags.removeArrayMany({}, { taggedItems: itemIds });
+    await this.tags.updateArrayMany({ taggedItems: { $in: itemIds } }, { $pull: { $taggedItems: { $in: itemIds } } });
     return { msg: `Items ${itemIds} successfully removed from all tags` };
   }
 
@@ -96,9 +96,11 @@ export default class TagConcept {
    */
   async itemsByTag(tags: string[], items: ObjectId[]) {
     const result = new Map<string, ObjectId[]>();
+    const stringItems = items.map((item) => item.toString());
     for (const tag of tags) {
       // Get all items with tag and then filter such that only items also in `items` remain
-      const commonItems = (await this.tags.readOne({ value: tag }))?.taggedItems.filter((item) => items.includes(item));
+      const taggedItems = (await this.tags.readOne({ value: tag }))?.taggedItems;
+      const commonItems = taggedItems?.filter((item) => stringItems.indexOf(item.toString()) !== -1);
       result.set(tag, commonItems ? commonItems : []);
     }
     return result;
