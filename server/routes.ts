@@ -232,9 +232,9 @@ class Routes {
     const taskIds = await Plan.getWeekTasks(user);
     const plan = await Task.getArrayTasks(taskIds);
     console.log(plan);
-    const readable = Array<Array<ReadableTaskDoc>>();
+    const readable = [];
     for (const date of plan) {
-      const tasks = new Array<ReadableTaskDoc>();
+      const tasks = [];
       for (const task of date) {
         tasks.push({ objective: task.objective, assignee: task.assignee, item: await Item.getItem(task.item) });
       }
@@ -280,10 +280,10 @@ class Routes {
   }
 }
 
-interface ReadableTaskDoc {
-  objective: string;
-  assignee: ObjectId;
-  item: ItemDoc | null;
-}
+// export interface ReadableTaskDoc {
+//   objective: string;
+//   assignee: ObjectId;
+//   item: ItemDoc | null;
+// }
 
 export default getExpressRouter(new Routes());
