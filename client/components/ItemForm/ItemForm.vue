@@ -2,6 +2,10 @@
 import { storage } from "@/utils/firebase.js";
 import "@material/web/button/filled-button.js";
 import "@material/web/textfield/outlined-text-field.js";
+import "@material/web/chips/chip-set.js";
+import "@material/web/chips/filter-chip.js";
+import "@material/web/select/outlined-select.js";
+import "@material/web/select/select-option.js";
 import { ref as fref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
 import { computed, ref, onBeforeMount } from "vue";
@@ -14,16 +18,15 @@ const name = ref("");
 const lastUsedDate = ref(formatDateShort(new Date()));
 const location = ref("");
 const purpose = ref("");
+const tags = ref([]);
+
+const chosenTags = ref([]);
+const originalTags = ref([]);
 const itemPicFile = ref();
-const itemPicURL = ref("");
+const originalImgURL = ref("");
+const itemPicURL = computed(() => (itemPicFile.value ? URL.createObjectURL(itemPicFile.value) : originalImgURL.value));
 
 const emit = defineEmits(["closeSheet"]);
-
-// const makeFake = async () => {
-//   await fetchy("/api/items", "POST", {
-//     body: { name: "Test Item", purpose: "This is a test description. Real descriptions are more helpful. Just padding this out to be a bit longer", lastUsedDate: new Date().toString() },
-//   });
-// };
 
 const submitForm = async (name: string, lastUsedDate: string, location: string, purpose: string) => {
   if (isEditing.value) {
@@ -42,13 +45,18 @@ const createItem = async (name: string, lastUsedDate: string, location: string, 
     const imageRef = fref(storage, imgName);
     FB_Promise = uploadBytes(imageRef, itemPicFile.value);
   }
+
   try {
     const DB_Promise = fetchy("/api/items", "POST", {
       body: { name, lastUsedDate, location, purpose, image: FB_Promise ? imgName : null },
     });
 
     console.log("waiting");
-    await Promise.all([DB_Promise, FB_Promise]);
+    const id = (await Promise.all([DB_Promise, FB_Promise]))[0].id;
+    console.log(id);
+    await fetchy(`/api/items/${id}`, "POST", {
+      body: { tags: chosenTags.value },
+    });
     console.log("done!");
 
     emit("closeSheet");
@@ -60,6 +68,8 @@ const createItem = async (name: string, lastUsedDate: string, location: string, 
 const updateItem = async (name: string, lastUsedDate: string, location: string, purpose: string) => {
   let FB_Promise = null;
   let imgName = "";
+  const newTags = chosenTags.value.filter((tag) => !originalTags.value.includes(tag));
+  const oldTags = originalTags.value.filter((tag) => !chosenTags.value.includes(tag));
 
   if (itemPicFile.value) {
     imgName = itemPicFile.value.name + v4();
@@ -73,6 +83,13 @@ const updateItem = async (name: string, lastUsedDate: string, location: string, 
     });
 
     console.log("waiting");
+
+    for (tag in oldTags) void fetchy(`/items/${props.itemID}/${tag}`, "DELETE");
+
+    await fetchy(`/items/${props.itemID}`, "POST", {
+      body: { tags: newTags },
+    });
+
     await Promise.all([DB_Promise, FB_Promise]);
     console.log("done!");
 
@@ -89,6 +106,7 @@ const emptyForm = () => {
   lastUsedDate.value = "";
   location.value = "";
   purpose.value = "";
+  chosen.tags = [];
 };
 
 function onInputChange(e: Event) {
@@ -101,17 +119,38 @@ function onInputChange(e: Event) {
   }
 }
 
+const loadFirebase = async (imgURL: string | null) => {
+  if (imgURL !== null) return await getDownloadURL(fref(storage, imgURL));
+  return "";
+};
+
 onBeforeMount(async () => {
+  tags.value = Array.from(await fetchy("/api/tags", "GET"));
+
   if (isEditing.value) {
     const itemDoc = await fetchy(`/api/items/${props.itemID}`, "GET");
+    originalTags.value = await fetchy(`/api/items/${props.itemID}/tags`, "GET");
+    chosenTags.value = originalTags.value;
+
     console.log(itemDoc);
     name.value = itemDoc.name;
     purpose.value = itemDoc.purpose;
     location.value = itemDoc.location;
     lastUsedDate.value = formatDateShort(new Date(itemDoc.lastUsedDate));
-    if (itemDoc.image) itemPicFile.value = await getDownloadURL(fref(storage, itemDoc.image));
+    originalImgURL.value = itemDoc.image ? await loadFirebase(itemDoc.image) : "";
   }
 });
+
+const addTag = () => {
+  const selectionBox = document.querySelector("md-outlined-select");
+  const selectedItem = Array.from(document.querySelectorAll("md-select-option")).filter((tag) => tag.selected)[0];
+  chosenTags.value.push(selectedItem.value);
+  selectionBox.reset();
+};
+
+const checkDeleted = (tag: string) => {
+  chosenTags.value = chosenTags.value.filter((x) => x !== tag);
+};
 </script>
 
 <template>
@@ -124,8 +163,8 @@ onBeforeMount(async () => {
       </div>
       <div class="image-input">
         <label for="file-input">
-          <div v-if="itemPicFile">
-            <img :src="itemPicURL" alt="No image" class="default-image" :key="itemPicURL" />
+          <div v-if="itemPicURL !== ''">
+            <img :src="itemPicURL" :alt="itemPicURL" class="default-image" :key="itemPicURL" />
           </div>
           <div v-else>
             <img src="@/assets/images/noImage.png" />
@@ -135,9 +174,17 @@ onBeforeMount(async () => {
       </div>
       <md-outlined-text-field required v-model="name" label="Name" placeholder="Name"></md-outlined-text-field>
       <md-outlined-text-field pattern="\d{2}/\d{2}/\d{4}" v-model="lastUsedDate" label="Last Used Date" placeholder="mm/dd/yyyy"></md-outlined-text-field>
-      <md-outlined-text-field v-model="location" label="Location" placeholder="Location"></md-outlined-text-field>
-      <md-outlined-text-field v-model="purpose" label="Description" type="textarea" placeholder="Description" rows="3" class="description-field"></md-outlined-text-field>
+      <md-outlined-text-field v-model="location" label="Location" placeholder="Enter a location"></md-outlined-text-field>
+      <md-outlined-text-field v-model="purpose" label="Description" type="textarea" placeholder="Add a description" rows="2" class="description-field"></md-outlined-text-field>
+      <md-outlined-select label="Select a tag" @input="addTag">
+        <md-select-option v-for="tag in tags.filter((x) => !chosenTags.includes(x))" :key="tag" :value="tag">
+          <div slot="headline">{{ tag }}</div>
+        </md-select-option>
+      </md-outlined-select>
 
+      <md-chip-set class="current-tags">
+        <md-filter-chip v-for="tag in chosenTags" :key="tag" :label="tag" @click="() => checkDeleted(tag)" selected></md-filter-chip>
+      </md-chip-set>
       <div class="button-group">
         <md-filled-button v-if="isEditing" type="button" class="submit-button">Discard</md-filled-button><md-filled-button type="submit" class="submit-button">Add</md-filled-button>
       </div>
@@ -147,7 +194,7 @@ onBeforeMount(async () => {
 
 <style scoped>
 .button-group {
-  margin: 16px auto;
+  margin: 8px 0 0 0;
   width: 100%;
   display: flex;
   justify-content: space-around;
@@ -158,6 +205,11 @@ onBeforeMount(async () => {
   align-self: flex-start;
 }
 
+.current-tags {
+  align-self: center;
+  max-width: 500px;
+}
+
 .creation-form {
   position: absolute;
   left: 50%;
@@ -165,7 +217,7 @@ onBeforeMount(async () => {
   width: 100vw;
   max-width: 800px;
   bottom: 0;
-  height: 90vh;
+  height: 98vh;
   z-index: 1;
   overflow: hidden;
 }
@@ -175,7 +227,8 @@ md-filled-button {
   --md-filled-button-label-text-color: var(--on-primary);
 }
 
-md-outlined-text-field {
+md-outlined-text-field,
+md-outlined-select {
   min-width: 400px;
   width: 30vw;
 }
