@@ -236,7 +236,7 @@ class Routes {
     for (const date of plan) {
       const tasks = [];
       for (const task of date) {
-        tasks.push({ objective: task.objective, assignee: task.assignee, item: await Item.getItem(task.item) });
+        tasks.push([task.objective, task.assignee, (await Item.getItem(task.item))?.name]);
       }
       readable.push(tasks);
     }
@@ -279,11 +279,5 @@ class Routes {
     return await Achievement.getAchievementData(user);
   }
 }
-
-// export interface ReadableTaskDoc {
-//   objective: string;
-//   assignee: ObjectId;
-//   item: ItemDoc | null;
-// }
 
 export default getExpressRouter(new Routes());
