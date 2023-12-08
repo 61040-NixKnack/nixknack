@@ -238,7 +238,7 @@ class Routes {
   /**
    * Call once when setting up the app. Sets the threshold values for each tag.
    */
-  @Router.get("/init")
+  @Router.post("/init")
   async init() {
     const arr = [
       ["Cookware", 5],
