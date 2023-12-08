@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotAllowedError, NotFoundError } from "./errors";
+import { NotAllowedError } from "./errors";
 
 const TASKS_PER_DAY = 3;
 
@@ -29,15 +29,16 @@ export default class PlanConcept {
     return dateCopy;
   }
 
-  async getTasksAtDate(user: ObjectId, date: Date) {
+  async getWeekTasks(user: ObjectId) {
+    const date = new Date();
     const deadline = this.normalizeDate(date);
-    const plan = await this.plans.readOne({ user, deadline });
-
-    if (!plan) {
-      throw new NotFoundError(`Plan for user ${user} and date ${date} not found!`);
+    const tasks = new Array<Promise<PlanDoc | null>>();
+    for (let i = 0; i < 7; i++) {
+      tasks.push(this.plans.readOne({ user, deadline }));
+      deadline.setDate(deadline.getDate() + 1);
     }
-
-    return plan.tasks;
+    const plan = await Promise.all(tasks);
+    return plan.map((item) => (item ? item.tasks : []));
   }
 
   async create(user: ObjectId, deadline: Date, tasks: ObjectId[]) {
