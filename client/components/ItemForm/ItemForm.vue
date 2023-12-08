@@ -19,7 +19,7 @@ const name = ref("");
 const lastUsedDate = ref(formatDateShort(new Date()));
 const location = ref("");
 const purpose = ref("");
-const tags = ref([]);
+const tags = ref<string[]>([]);
 
 const chosenTags = ref([]);
 const originalTags = ref([]);
