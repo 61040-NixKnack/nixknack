@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { storage } from "@/utils/firebase.js";
+import router from "@/router/index";
 import "@material/web/button/filled-button.js";
 import "@material/web/textfield/outlined-text-field.js";
 import "@material/web/chips/chip-set.js";
@@ -71,6 +72,8 @@ const updateItem = async (name: string, lastUsedDate: string, location: string, 
   const newTags = chosenTags.value.filter((tag) => !originalTags.value.includes(tag));
   const oldTags = originalTags.value.filter((tag) => !chosenTags.value.includes(tag));
 
+  console.log(newTags, oldTags);
+
   if (itemPicFile.value) {
     imgName = itemPicFile.value.name + v4();
     const imageRef = fref(storage, imgName);
@@ -78,17 +81,18 @@ const updateItem = async (name: string, lastUsedDate: string, location: string, 
   }
 
   try {
-    const DB_Promise = await fetchy(`/api/items/${props.itemID}`, "PATCH", {
-      body: { name, lastUsedDate, location, purpose, image: FB_Promise ? imgName : null },
+    const DB_Promise = fetchy(`/api/items/${props.itemID}`, "PATCH", {
+      body: FB_Promise ? { name, lastUsedDate, location, purpose, image: imgName } : { name, lastUsedDate, location, purpose },
     });
 
     console.log("waiting");
 
     for (tag in oldTags) void fetchy(`/items/${props.itemID}/${tag}`, "DELETE");
 
-    await fetchy(`/items/${props.itemID}`, "POST", {
-      body: { tags: newTags },
-    });
+    if (newTags !== [])
+      await fetchy(`/items/${props.itemID}`, "POST", {
+        body: { tags: newTags },
+      });
 
     await Promise.all([DB_Promise, FB_Promise]);
     console.log("done!");
@@ -125,7 +129,7 @@ const loadFirebase = async (imgURL: string | null) => {
 };
 
 onBeforeMount(async () => {
-  tags.value = Array.from(await fetchy("/api/tags", "GET"));
+  tags.value = Array.from(await fetchy("/api/tags", "GET")).sort();
 
   if (isEditing.value) {
     const itemDoc = await fetchy(`/api/items/${props.itemID}`, "GET");
@@ -150,6 +154,11 @@ const addTag = () => {
 
 const checkDeleted = (tag: string) => {
   chosenTags.value = chosenTags.value.filter((x) => x !== tag);
+};
+
+const deleteItem = async () => {
+  await fetchy(`/api/items/${props.itemID}`, "DELETE");
+  await router.push({ name: "Catalog" });
 };
 </script>
 
@@ -186,7 +195,7 @@ const checkDeleted = (tag: string) => {
         <md-filter-chip v-for="tag in chosenTags" :key="tag" :label="tag" @click="() => checkDeleted(tag)" selected></md-filter-chip>
       </md-chip-set>
       <div class="button-group">
-        <md-filled-button v-if="isEditing" type="button" class="submit-button">Discard</md-filled-button><md-filled-button type="submit" class="submit-button">Add</md-filled-button>
+        <md-filled-button v-if="isEditing" type="button" class="submit-button" @click="deleteItem">Delete</md-filled-button><md-filled-button type="submit" class="submit-button">Add</md-filled-button>
       </div>
     </form>
   </div>
