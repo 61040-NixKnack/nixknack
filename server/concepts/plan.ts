@@ -61,7 +61,7 @@ export default class PlanConcept {
     let minDate = new Date();
     minDate = this.normalizeDate(minDate);
 
-    while (d >= minDate && (await this.getTasksAtDate(user, d)).length === 0) {
+    while (d.getDate() >= minDate.getDate() && (await this.getTasksAtDate(user, d)).length === 0) {
       await this.create(user, d, taskPool as ObjectId[]);
       d.setDate(d.getDate() - 1);
     }
