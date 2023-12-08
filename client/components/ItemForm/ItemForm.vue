@@ -129,7 +129,7 @@ const loadFirebase = async (imgURL: string | null) => {
 };
 
 onBeforeMount(async () => {
-  tags.value = Array.from(await fetchy("/api/tags", "GET")).sort();
+  tags.value = (await fetchy("/api/tags", "GET")).sort();
 
   if (isEditing.value) {
     const itemDoc = await fetchy(`/api/items/${props.itemID}`, "GET");
