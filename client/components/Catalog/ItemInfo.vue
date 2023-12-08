@@ -23,6 +23,7 @@ onBeforeMount(async () => {
     itemDesc.value = itemDoc.purpose;
     lastUsed.value = formatDateShort(new Date(itemDoc.lastUsedDate));
     if (itemDoc.image) imageURL.value = await getDownloadURL(fref(storage, itemDoc.image));
+    itemTags.value = await fetchy(`/api/items/${props.itemID}/tags`, "GET");
   } catch (error) {
     await router.push({ name: "not-found-page" });
   }
