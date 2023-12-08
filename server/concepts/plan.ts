@@ -26,6 +26,7 @@ export default class PlanConcept {
     dateCopy.setHours(0);
     dateCopy.setMinutes(0);
     dateCopy.setSeconds(0);
+    dateCopy.setMilliseconds(0);
     return dateCopy;
   }
 
