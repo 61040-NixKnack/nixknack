@@ -89,7 +89,7 @@ const updateItem = async (name: string, lastUsedDate: string, location: string, 
 
     for (const tag in oldTags) void fetchy(`/items/${props.itemID}/${tag}`, "DELETE");
 
-    if (newTags !== [])
+    if (newTags)
       await fetchy(`/items/${props.itemID}`, "POST", {
         body: { tags: newTags },
       });
