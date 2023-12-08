@@ -211,6 +211,15 @@ class Routes {
     return plan;
   }
 
+  @Router.get("/tags")
+  async getUserTags(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const userItems = await Item.getItems({ owner: user });
+    const itemIDs = userItems.map((item) => item._id);
+    const userTags = new Set(await Tag.getTags(itemIDs));
+    return new Set(...userTags, ...Tag.definedTags);
+  }
+
   /**
    * Gets the number of XP points a user has
    * @param session user session ObjectId
