@@ -32,6 +32,18 @@ export default class PointConcept {
     return { msg: `Points updated from ${pts} to ${newPoints}!` };
   }
 
+  async create(user: ObjectId) {
+    await this.unique(user);
+    await this.points.createOne({ user: user, points: 0 });
+    return { msg: `Points for ${user} successfully created!` };
+  }
+
+  private async unique(user: ObjectId) {
+    const maybePoint = await this.points.readOne({ user: user });
+    if (maybePoint !== null) {
+      throw new NotFoundError(`User Point already exists!`);
+    }
+  }
   async deleteByUser(user: ObjectId) {
     await this.points.deleteOne({ user });
     return { msg: "Points deleted!" };
