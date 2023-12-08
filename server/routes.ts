@@ -110,12 +110,16 @@ class Routes {
   }
 
   @Router.delete("/items/:_id")
-  async deleteItem(session: WebSessionDoc, _id: ObjectId) {
+  async deleteItem(session: WebSessionDoc, _id: ObjectId, points: boolean) {
     const id = new ObjectId(_id);
     const user = WebSession.getUser(session);
     await Item.isOwner(user, id);
     await Tag.deleteItemFromAll([id]); // Delete item from all tags.
     await Task.deleteAll({ item: id });
+    if (points) {
+      await Point.addPoints(user, 10);
+      await Achievement.updateProgress(user, AchievementName.ItemsDiscarded, 1);
+    }
     return Item.delete({ _id: id });
   }
 
@@ -174,6 +178,7 @@ class Routes {
     await Item.delete({ _id: id });
     await Point.addPoints(user, 10);
     await Achievement.updateProgress(user, AchievementName.CompletedTasks, 1);
+    await Achievement.updateProgress(user, AchievementName.ItemsDiscarded, 1);
     return { msg: "Success" };
   }
 
@@ -221,7 +226,8 @@ class Routes {
     const userItems = await Item.getItems({ owner: user });
     const itemIDs = userItems.map((item) => item._id);
     const userTags = new Set(await Tag.getTags(itemIDs));
-    return [...userTags, ...Tag.definedTags].sort();
+    const tags = new Set(...userTags, ...Tag.definedTags);
+    return Array.from(tags).sort();
   }
 
   /**
