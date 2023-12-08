@@ -10,6 +10,42 @@ export interface TagDoc extends BaseDoc {
 
 export default class TagConcept {
   public readonly tags = new DocCollection<TagDoc>("tags");
+  public readonly definedTags = new Set([
+    "Cookware",
+    "Utensils",
+    "Kitchen Tools",
+    "Dishes",
+    "Glassware",
+    "Small Appliances",
+    "Tupperware",
+    "Tops (Clothing)",
+    "Bottoms (Clothing)",
+    "Sweaters, Sweatshirts & Hoodies",
+    "Coats & Jackets",
+    "Shoes",
+    "Jewelry",
+    "Hats",
+    "Undergarments",
+    "Accessories (Clothing)",
+    "Other (Clothing)",
+    "Bedding",
+    "Furniture",
+    "Electronics",
+    "Books & Magazines",
+    "Decor",
+    "Toiletries",
+    "Makeup & Skincare",
+    "Towels",
+    "Cleaning Supplies",
+    "Office Supplies",
+    "Paper",
+    "Sports Equipment",
+    "Toys & Games",
+    "CDs, DVDs & Tapes",
+    "Hand Tools & Workshop Supplies",
+    "Sentimental",
+    "Weaponry",
+  ]);
 
   async create(tag: string, tn?: number) {
     await this.uniqueTag(tag);
