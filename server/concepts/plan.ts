@@ -58,7 +58,7 @@ export default class PlanConcept {
     d.setDate(d.getDate() + 6);
 
     for (let i = 6; i >= 0; i--) {
-      if ((await this.getTasksAtDate(user, d)).length === 0) {
+      if ((await this.getTasksAtDate(user, d)).length !== 0) {
         break;
       }
       await this.create(user, d, taskPool as ObjectId[]);
