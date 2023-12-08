@@ -42,7 +42,7 @@ const goBack = async () => {
 };
 
 const discardItem = async () => {
-  await fetchy(`/api/items/${props.itemID}`, "DELETE");
+  await fetchy(`/task/${props.itemID}`, "DELETE");
   await router.push({ name: "Catalog" });
 };
 </script>
