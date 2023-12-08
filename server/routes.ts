@@ -112,30 +112,26 @@ class Routes {
   }
 
   @Router.delete("/items/:_id")
-  async deleteItem(session: WebSessionDoc, _id: ObjectId, points: string) {
+  async deleteItem(session: WebSessionDoc, _id: ObjectId) {
     const id = new ObjectId(_id);
     const user = WebSession.getUser(session);
     await Item.isOwner(user, id);
     await Tag.deleteItemFromAll([id]); // Delete item from all tags.
     await Task.deleteAll({ item: id });
-    if (points === "true") {
-      await Point.addPoints(user, 10);
-      await Achievement.updateProgress(user, AchievementName.ItemsDiscarded, 1);
-    }
     return Item.delete({ _id: id });
   }
 
-  // @Router.delete("/items/:_id")
-  // async discardItem(session: WebSessionDoc, _id: ObjectId, points: boolean) {
-  //   const id = new ObjectId(_id);
-  //   const user = WebSession.getUser(session);
-  //   await Item.isOwner(user, id);
-  //   await Tag.deleteItemFromAll([id]); // Delete item from all tags.
-  //   await Task.deleteAll({ item: id });
-  //   await Point.addPoints(user, 10);
-  //   await Achievement.updateProgress(user, AchievementName.ItemsDiscarded, 1);
-  //   return Item.delete({ _id: id });
-  // }
+  @Router.delete("/items/:_id/points")
+  async discardItem(session: WebSessionDoc, _id: ObjectId) {
+    const id = new ObjectId(_id);
+    const user = WebSession.getUser(session);
+    await Item.isOwner(user, id);
+    await Tag.deleteItemFromAll([id]); // Delete item from all tags.
+    await Task.deleteAll({ item: id });
+    await Point.addPoints(user, 10);
+    await Achievement.updateProgress(user, AchievementName.ItemsDiscarded, 1);
+    return Item.delete({ _id: id });
+  }
 
   @Router.post("/items/:_id")
   async addItemToTags(session: WebSessionDoc, _id: ObjectId, tags: string[]) {
