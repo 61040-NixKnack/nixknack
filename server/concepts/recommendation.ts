@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { BadValuesError, NotAllowedError, NotFoundError } from "./errors";
 
@@ -23,6 +24,10 @@ export default class RecommendationConcept {
     }
 
     return recStr;
+  }
+
+  async getRecommendationById(_id: ObjectId) {
+    return await this.recs.readOne({ _id });
   }
 
   async create(tag: string, text: string) {
