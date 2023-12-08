@@ -169,8 +169,7 @@ const deleteItem = async () => {
     <form @submit.prevent="submitForm(name, lastUsedDate, location, purpose)">
       <div class="creation-form-header">
         <div class="close-button material-symbols-outlined" @click="emit('closeSheet')">close</div>
-        <h2 class="hint-text" v-if="isEditing">Edit your KnickKnack</h2>
-        <h2 class="hint-text" v-else>Add a KnickKnack</h2>
+        <h2 class="hint-text">{{ isEditing ? "Edit your KnickKnack" : "Add a KnickKnack" }}</h2>
       </div>
       <div class="image-input">
         <label for="file-input">
@@ -197,7 +196,8 @@ const deleteItem = async () => {
         <md-filter-chip v-for="tag in chosenTags" :key="tag" :label="tag" @click="() => checkDeleted(tag)" selected></md-filter-chip>
       </md-chip-set>
       <div class="button-group">
-        <md-filled-button v-if="isEditing" type="button" class="submit-button" @click="deleteItem">Delete</md-filled-button><md-filled-button type="submit" class="submit-button">Add</md-filled-button>
+        <md-filled-button v-if="isEditing" type="button" class="submit-button" @click="deleteItem">Delete</md-filled-button
+        ><md-filled-button type="submit" class="submit-button">{{ isEditing ? "Update" : "Add" }}</md-filled-button>
       </div>
     </form>
   </div>
