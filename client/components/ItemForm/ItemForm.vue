@@ -110,7 +110,7 @@ const emptyForm = () => {
   lastUsedDate.value = "";
   location.value = "";
   purpose.value = "";
-  chosen.tags = [];
+  chosenTags.value = [];
 };
 
 function onInputChange(e: Event) {
