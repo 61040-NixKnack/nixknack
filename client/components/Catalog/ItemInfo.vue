@@ -39,7 +39,6 @@ const reloadItem = async () => {
 const goBack = async () => {
   await router.push({ name: "Catalog" });
 };
-
 </script>
 
 <template>
