@@ -21,7 +21,7 @@ onBeforeMount(async () => {
       <h2>{{ dateName[(taskInd - 1 + offset) % 7] }}</h2>
       <div v-if="userPlan[taskInd - 1].length > 0">
         <div v-for="item in userPlan[taskInd - 1]" :key="item">
-          <p>• <b>Task:</b>Item: {{ item[-1] }} {{ item[0] }}</p>
+          <p>• <b>Task:</b>Item: {{ item[2] }} {{ item[0] }}</p>
         </div>
       </div>
       <div v-else>

@@ -236,7 +236,11 @@ class Routes {
     for (const date of plan) {
       const tasks = [];
       for (const task of date) {
-        tasks.push([task.objective, task.assignee, (await Item.getItem(task.item))?.name]);
+        let name = (await Item.getItem(task.item))?.name;
+        if (name === undefined) {
+          name = "";
+        }
+        tasks.push([task.objective, task.assignee, name]);
       }
       readable.push(tasks);
     }
