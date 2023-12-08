@@ -9,6 +9,7 @@
   --on-primary: #0e171b;
 
   --md-sys-color-primary: var(--secondary);
+  --md-sys-color-secondary-container: var(--dark-accent);
   
   background-color: var(--primary);
 }
