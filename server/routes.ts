@@ -174,6 +174,7 @@ class Routes {
     await Item.delete({ _id: id });
     await Point.addPoints(user, 10);
     await Achievement.updateProgress(user, AchievementName.CompletedTasks, 1);
+    return { msg: "Success" };
   }
 
   @Router.post("/plans")
@@ -203,6 +204,7 @@ class Routes {
     }
 
     await Plan.populateWeekTasks(user, taskPool);
+    return { msg: "Success" };
   }
 
   @Router.get("/plans")
