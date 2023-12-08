@@ -70,6 +70,7 @@ h2 {
   padding-right: 15px;
   color: var(--on-primary);
   width: fit-content;
+  cursor: pointer;
 }
 
 #delete-button {
@@ -82,5 +83,6 @@ h2 {
   background-color: #ff5252;
   color: white;
   width: fit-content;
+  cursor: pointer;
 }
 </style>

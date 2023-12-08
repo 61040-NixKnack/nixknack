@@ -71,6 +71,7 @@ button {
   padding-left: 15px;
   padding-right: 15px;
   color: var(--on-primary);
+  cursor: pointer;
 }
 div {
   margin-top: 8px;

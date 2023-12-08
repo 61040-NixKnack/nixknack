@@ -156,6 +156,7 @@ onBeforeMount(async () => {
 
 .close-button {
   align-self: flex-start;
+  cursor: pointer;
 }
 
 .creation-form {

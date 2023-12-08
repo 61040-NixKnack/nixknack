@@ -39,7 +39,6 @@ const reloadItem = async () => {
 const goBack = async () => {
   await router.push({ name: "Catalog" });
 };
-
 </script>
 
 <template>
@@ -139,6 +138,7 @@ form {
 #back_arr {
   font-size: 40px;
   font-weight: bold;
+  cursor: pointer;
 }
 
 #imgSection {
@@ -148,9 +148,13 @@ form {
 }
 
 #itemImg {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: fit-content;
   width: fit-content;
+  min-width: 180px;
+  min-height: 180px;
 }
 
 #itemDesc {
@@ -208,11 +212,12 @@ form {
   padding-top: 10px;
   padding-bottom: 10px;
   border-radius: 25px;
+  cursor: pointer;
 }
 
 img {
-  width: 180px;
-  height: 180px;
+  max-width: 180px;
+  max-height: 180px;
 }
 
 .shade {
