@@ -19,13 +19,11 @@ export default class TaskConcept {
 
   async complete(_id: ObjectId) {
     await this.itemExists(_id);
-    const task = await this.tasks.readOne({ _id });
-    await this.tasks.deleteOne({ _id });
-    return task?.item;
+    await this.tasks.deleteOne({ item: _id });
   }
 
   async isAssigned(user: ObjectId, _id: ObjectId) {
-    const maybeTask = await this.tasks.readOne({ _id: _id, assignee: user });
+    const maybeTask = await this.tasks.readOne({ item: _id, assignee: user });
     if (maybeTask === null) {
       throw new NotAllowedError(`Task ${_id} is not assigned for user ${user}`);
     }
@@ -65,7 +63,7 @@ export default class TaskConcept {
   }
 
   private async itemExists(_id: ObjectId) {
-    const maybeTask = await this.tasks.readOne({ _id });
+    const maybeTask = await this.tasks.readOne({ item: _id });
     if (maybeTask === null) {
       throw new NotAllowedError(`Task ${_id} does not exist!`);
     }

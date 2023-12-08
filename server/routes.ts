@@ -169,11 +169,9 @@ class Routes {
     const user = WebSession.getUser(session);
     const id = new ObjectId(_id);
     await Task.isAssigned(user, id);
-    const item = await Task.complete(id);
-    if (item) {
-      await Tag.deleteItemFromAll([item]);
-      await Item.delete({ _id: item });
-    }
+    await Task.complete(id);
+    await Tag.deleteItemFromAll([id]);
+    await Item.delete({ _id: id });
     await Point.addPoints(user, 10);
     await Achievement.updateProgress(user, AchievementName.CompletedTasks, 1);
   }
