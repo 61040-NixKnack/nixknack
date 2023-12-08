@@ -47,6 +47,7 @@ class Routes {
     await Item.delete({ owner: user });
     await Point.deleteByUser(user);
     await Plan.deleteByUser(user);
+    await Achievement.deleteUserProgress(user);
     return await User.delete(user);
   }
 
