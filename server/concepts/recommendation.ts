@@ -1,5 +1,5 @@
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { BadValuesError, NotAllowedError } from "./errors";
+import { BadValuesError, NotAllowedError, NotFoundError } from "./errors";
 
 export interface RecommendationDoc extends BaseDoc {
   tag: string;
@@ -13,8 +13,13 @@ export default class RecommendationConcept {
     const recStr = await this.recs.readOne({ tag });
 
     if (!recStr) {
-      // Default str
-      return "Throw it out or recycle if possible (check Earth911 for potential recycling methods)";
+      const misc = await this.recs.readOne({ tag: "!msc" });
+
+      if (!misc) {
+        throw new NotFoundError("Default tag not found!");
+      }
+
+      return misc;
     }
 
     return recStr;

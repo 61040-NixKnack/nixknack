@@ -357,6 +357,7 @@ class Routes {
       ["Hand Tools & Workshop Supplies", "Donate it to charity (e.g. Habitat for Humanity, the Salvation Army, Goodwill). Or, if the manufacturer has a recycling program, recycle it."],
       ["Sentimental", "Store it in your garage or a storage facility"],
       ["Weaponry", "Dispose of it with your local law enforcement or sell it"],
+      ["!msc", "Throw it out or recycle if possible (check Earth911 for potential recycling methods)"],
     ];
 
     for (const [tag, r] of recs) {
