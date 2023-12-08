@@ -178,6 +178,17 @@ class Routes {
     return rec; // # To Do: Fix Responses, what type of information does front end want?
   }
 
+  /**
+   * Get the descriptive recommendation text for a tag
+   * @param tag the tag to get the recommendation for
+   * @returns a recommendation string
+   */
+  @Router.get("/recs/id/:_id")
+  async getRecommendationById(_id: ObjectId) {
+    const rec = await Recommendation.getRecommendationById(_id);
+    return rec; // # To Do: Fix Responses, what type of information does front end want?
+  }
+
   @Router.delete("/task/:_id")
   async completeTask(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
