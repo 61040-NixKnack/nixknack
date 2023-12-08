@@ -22,7 +22,7 @@ const internalValue = ref(props.modelValue.value);
         }
       "
     />
-    <button class="search-button material-symbols-outlined">filter_list</button>
+    <!-- <button class="search-button material-symbols-outlined">filter_list</button> -->
   </form>
 </template>
 
