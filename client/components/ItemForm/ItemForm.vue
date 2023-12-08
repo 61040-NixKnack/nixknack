@@ -21,8 +21,8 @@ const location = ref("");
 const purpose = ref("");
 const tags = ref<string[]>([]);
 
-const chosenTags = ref([]);
-const originalTags = ref([]);
+const chosenTags = ref<string[]>([]);
+const originalTags = ref<string[]>([]);
 const itemPicFile = ref();
 const originalImgURL = ref("");
 const itemPicURL = computed(() => (itemPicFile.value ? URL.createObjectURL(itemPicFile.value) : originalImgURL.value));
