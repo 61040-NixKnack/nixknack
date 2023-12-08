@@ -41,6 +41,32 @@ export default class PlanConcept {
     return plan.map((item) => (item ? item.tasks : []));
   }
 
+  async getTasksAtDate(user: ObjectId, deadline: Date) {
+    const plans = await this.plans.readOne({ user, deadline });
+
+    if (!plans) {
+      return [];
+    }
+
+    return plans.tasks;
+  }
+
+  async populateWeekTasks(user: ObjectId, taskPool: ObjectId[]) {
+    // Start 7 days ahead
+    let d = new Date();
+    d = this.normalizeDate(d);
+    d.setDate(d.getDate() + 6);
+
+    // Current date
+    let minDate = new Date();
+    minDate = this.normalizeDate(minDate);
+
+    while (d >= minDate && !(await this.getTasksAtDate(user, d))) {
+      await this.create(user, d, taskPool as ObjectId[]);
+      d.setDate(d.getDate() - 1);
+    }
+  }
+
   async create(user: ObjectId, deadline: Date, tasks: ObjectId[]) {
     await this.alreadyHasPlan(user, deadline);
 

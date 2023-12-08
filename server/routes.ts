@@ -181,7 +181,7 @@ class Routes {
     const userTags = await Tag.getTags(items);
     const itemsByTag = await Tag.itemsByTag(userTags, items);
 
-    const taskPool = [];
+    const taskPool: ObjectId[] = [];
 
     for (const [tag, itm] of itemsByTag) {
       // Pass tags into Recommendation in bulk and mapping for tag and recId
@@ -191,32 +191,16 @@ class Routes {
         // Add this into Task and have it return taskPool
         for (const i of itm) {
           const maybeTask = await Task.getTasks({ user, rec: recId, item: i }, true);
-          let taskId = undefined;
           if (maybeTask) {
-            taskId = maybeTask[0];
+            taskPool.push(maybeTask[0] as ObjectId);
           } else {
-            taskId = (await Task.assign(user, recId, i))._id;
+            taskPool.push((await Task.assign(user, recId, i))._id);
           }
-          taskPool.push(taskId);
         }
       }
     }
 
-    // Make this a function in Plan
-
-    // Start 7 days ahead
-    // let d = new Date();
-    // d = Plan.normalizeDate(d);
-    // d.setDate(d.getDate() + 6);
-
-    // // Current date
-    // let minDate = new Date();
-    // minDate = Plan.normalizeDate(minDate);
-
-    // while (d >= minDate && !(await Plan.getTasksAtDate(user, d))) {
-    //   await Plan.create(user, d, taskPool as ObjectId[]);
-    //   d.setDate(d.getDate() - 1);
-    // }
+    await Plan.populateWeekTasks(user, taskPool);
   }
 
   @Router.get("/plans")
