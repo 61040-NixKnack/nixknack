@@ -61,7 +61,7 @@ export default class PlanConcept {
     let minDate = new Date();
     minDate = this.normalizeDate(minDate);
 
-    while (d >= minDate && !(await this.getTasksAtDate(user, d))) {
+    while (d >= minDate && (await this.getTasksAtDate(user, d)).length === 0) {
       await this.create(user, d, taskPool as ObjectId[]);
       d.setDate(d.getDate() - 1);
     }
@@ -72,7 +72,7 @@ export default class PlanConcept {
 
     const selected: ObjectId[] = this.choose(tasks, TASKS_PER_DAY);
     const _id = await this.plans.createOne({ user, deadline, tasks: selected });
-    return { msg: "User created successfully!", plan: await this.plans.readOne({ _id }) };
+    return { msg: "Plan created successfully!", plan: await this.plans.readOne({ _id }) };
   }
 
   async expireTask(user: ObjectId) {
