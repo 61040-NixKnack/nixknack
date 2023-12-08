@@ -94,7 +94,7 @@ class Routes {
   async createItem(session: WebSessionDoc, name: string, lastUsedDate?: Date, location?: string, purpose?: string, image?: string) {
     const user = WebSession.getUser(session);
     const created = await Item.create(user, name, lastUsedDate, location, purpose, image);
-    return { msg: created.msg };
+    return { msg: created.msg, id: created.id };
   }
 
   @Router.patch("/items/:_id")
