@@ -3,6 +3,8 @@ import router from "@/router";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import UpdateUserForm from "../components/Setting/UpdateUserForm.vue";
+import { fetchy } from "../utils/fetchy";
+import { onBeforeMount, ref } from "vue";
 
 const { currentUsername } = storeToRefs(useUserStore());
 const { logoutUser, deleteUser } = useUserStore();
@@ -16,20 +18,53 @@ async function delete_() {
   await deleteUser();
   await router.push({ name: "Login" });
 }
+
+const points = ref(0);
+const achievementReady = ref(false);
+const achievementData = ref();
+
+onBeforeMount(async () => {
+  points.value = await fetchy("api/points", "GET");
+  achievementData.value = await fetchy("/api/achievements", "GET");
+  achievementReady.value = true;
+});
 </script>
 
 <template>
   <main class="column" id="profile-main">
     <section>
       <h2>{{ currentUsername }}'s Profile</h2>
-      <!-- <h3>Points:</h3> -->
+      <h3>Total Exp: {{ points }}</h3>
     </section>
-    <!-- <section>
+    <section>
       <h2>Achievements</h2>
-      <div class="secondary-div">
-        <img src="@/assets/images/noImage.png" />
+      <div id="all-achievements">
+        <div class="achievement secondary-div">
+          <p>
+            <b>Level {{ achievementReady ? achievementData[0]["exp"] : 0 }}</b>
+          </p>
+          <p>To next: {{ achievementReady ? achievementData[2]["exp"][1] - achievementData[1]["exp"] : 0 }}</p>
+        </div>
+        <div class="achievement secondary-div">
+          <p>
+            <b>Item Discarder {{ achievementReady ? achievementData[0]["added"] : 0 }}</b>
+          </p>
+          <p>To Next: {{ achievementReady ? achievementData[2]["added"][1] - achievementData[1]["added"] : 0 }}</p>
+        </div>
+        <div class="achievement secondary-div">
+          <p>
+            <b>Item Adder {{ achievementReady ? achievementData[0]["discarded"] : 0 }}</b>
+          </p>
+          <p>To Next: {{ achievementReady ? achievementData[2]["discarded"][1] - achievementData[1]["discarded"] : 0 }}</p>
+        </div>
+        <div class="achievement secondary-div">
+          <p>
+            <b>Task Completer {{ achievementReady ? achievementData[0]["tasks"] : 0 }}</b>
+          </p>
+          <p>To Next: {{ achievementReady ? achievementData[2]["tasks"][1] - achievementData[1]["tasks"] : 0 }}</p>
+        </div>
       </div>
-    </section> -->
+    </section>
     <section>
       <h2>Settings</h2>
       <div class="secondary-div">
@@ -47,6 +82,9 @@ async function delete_() {
 }
 h2 {
   font-size: 32px;
+  color: var(--on-primary);
+}
+h3 {
   color: var(--on-primary);
 }
 .secondary-div {
@@ -84,5 +122,11 @@ h2 {
   color: white;
   width: fit-content;
   cursor: pointer;
+}
+
+#all-achievements {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 </style>

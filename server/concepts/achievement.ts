@@ -68,7 +68,7 @@ export default class AchievementConcept {
       thresholdsMap.set(a.name, [a.thresholds[level], a.thresholds[level + 1]]);
     }
 
-    return [levelMap, progressMap, thresholdsMap];
+    return [Object.fromEntries(levelMap), Object.fromEntries(progressMap), Object.fromEntries(thresholdsMap)];
   }
 
   async updateProgress(user: ObjectId, name: AchievementName, progress: number) {

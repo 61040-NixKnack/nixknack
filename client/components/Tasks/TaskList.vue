@@ -10,6 +10,7 @@ const offset = new Date().getDay();
 
 onBeforeMount(async () => {
   // Get user plan from server
+  let a = await fetchy("/api/plans", "POST");
   userPlan.value = await fetchy("/api/plans", "GET");
 });
 </script>

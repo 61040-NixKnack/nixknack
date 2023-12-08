@@ -51,13 +51,13 @@ const createItem = async (name: string, lastUsedDate: string, location: string, 
       body: { name, lastUsedDate, location, purpose, image: FB_Promise ? imgName : null },
     });
 
-    console.log("waiting");
+    // console.log("waiting");
     const id = (await Promise.all([DB_Promise, FB_Promise]))[0].id;
-    console.log(id);
+    // console.log(id);
     await fetchy(`/api/items/${id}`, "POST", {
       body: { tags: chosenTags.value },
     });
-    console.log("done!");
+    // console.log("done!");
 
     emit("closeSheet");
   } catch (_) {
@@ -82,7 +82,7 @@ const updateItem = async (name: string, lastUsedDate: string, location: string, 
       body: { name, lastUsedDate, location, purpose, image: FB_Promise ? imgName : null },
     });
 
-    console.log("waiting");
+    // console.log("waiting");
 
     for (tag in oldTags) void fetchy(`/items/${props.itemID}/${tag}`, "DELETE");
 
@@ -91,7 +91,7 @@ const updateItem = async (name: string, lastUsedDate: string, location: string, 
     });
 
     await Promise.all([DB_Promise, FB_Promise]);
-    console.log("done!");
+    // console.log("done!");
 
     emit("closeSheet");
   } catch (_) {
@@ -132,7 +132,7 @@ onBeforeMount(async () => {
     originalTags.value = await fetchy(`/api/items/${props.itemID}/tags`, "GET");
     chosenTags.value = originalTags.value;
 
-    console.log(itemDoc);
+    // console.log(itemDoc);
     name.value = itemDoc.name;
     purpose.value = itemDoc.purpose;
     location.value = itemDoc.location;
@@ -163,10 +163,10 @@ const checkDeleted = (tag: string) => {
       </div>
       <div class="image-input">
         <label for="file-input">
-          <div v-if="itemPicURL !== ''">
+          <div v-if="itemPicURL !== ''" class="img-container">
             <img :src="itemPicURL" :alt="itemPicURL" class="default-image" :key="itemPicURL" />
           </div>
-          <div v-else>
+          <div v-else class="img-container">
             <img src="@/assets/images/noImage.png" />
           </div>
         </label>
@@ -262,7 +262,15 @@ form {
 }
 
 img {
-  width: 180px;
-  height: 180px;
+  max-width: 180px;
+  max-height: 180px;
+}
+
+.img-container {
+  min-width: 180px;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
