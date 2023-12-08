@@ -83,4 +83,9 @@ export default class AchievementConcept {
 
     return { msg: `Updated progress of achievement ${name} to level ${level} with progress ${progress}` };
   }
+
+  async deleteUserProgress(user: ObjectId) {
+    await this.user_achieves.deleteMany({ user });
+    return { msg: "User progress deleted!" };
+  }
 }

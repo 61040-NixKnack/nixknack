@@ -31,6 +31,14 @@ export default class TaskConcept {
     }
   }
 
+  async getArrayTasks(ids: ObjectId[][]) {
+    const tasks = new Array<Promise<TaskDoc[]>>();
+    for (const id of ids) {
+      tasks.push(this.getTasks({ _id: { $in: id } }, false) as Promise<TaskDoc[]>);
+    }
+    return await Promise.all(tasks);
+  }
+
   /**
    * @param query MongoDB query
    * @param id if true only return task ids

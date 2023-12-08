@@ -13,19 +13,25 @@ export default class RecommendationConcept {
     const recStr = await this.recs.readOne({ tag });
 
     if (!recStr) {
-      throw new NotFoundError(`Recommendation for tag ${tag} not found!`);
+      const misc = await this.recs.readOne({ tag: "!msc" });
+
+      if (!misc) {
+        throw new NotFoundError("Default tag not found!");
+      }
+
+      return misc;
     }
 
     return recStr;
   }
 
-  private async create(tag: string, text: string) {
+  async create(tag: string, text: string) {
     await this.canCreate(tag, text);
     const _id = await this.recs.createOne({ tag, text });
     return { msg: "Recommendation created successfully!", rec: await this.recs.readOne({ _id }) };
   }
 
-  private async delete(tag: string) {
+  async delete(tag: string) {
     await this.recs.deleteOne({ tag });
     return { msg: "Recommendation deleted!" };
   }

@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotAllowedError, NotFoundError } from "./errors";
+import { NotAllowedError } from "./errors";
 
 const TASKS_PER_DAY = 3;
 
@@ -29,15 +29,42 @@ export default class PlanConcept {
     return dateCopy;
   }
 
-  async getTasksAtDate(user: ObjectId, date: Date) {
+  async getWeekTasks(user: ObjectId) {
+    const date = new Date();
     const deadline = this.normalizeDate(date);
-    const plan = await this.plans.readOne({ user, deadline });
+    const tasks = new Array<Promise<PlanDoc | null>>();
+    for (let i = 0; i < 7; i++) {
+      tasks.push(this.plans.readOne({ user, deadline }));
+      deadline.setDate(deadline.getDate() + 1);
+    }
+    const plan = await Promise.all(tasks);
+    return plan.map((item) => (item ? item.tasks : []));
+  }
 
-    if (!plan) {
-      throw new NotFoundError(`Plan for user ${user} and date ${date} not found!`);
+  async getTasksAtDate(user: ObjectId, deadline: Date) {
+    const plans = await this.plans.readOne({ user, deadline });
+
+    if (!plans) {
+      return [];
     }
 
-    return plan.tasks;
+    return plans.tasks;
+  }
+
+  async populateWeekTasks(user: ObjectId, taskPool: ObjectId[]) {
+    // Start 7 days ahead
+    let d = new Date();
+    d = this.normalizeDate(d);
+    d.setDate(d.getDate() + 6);
+
+    // Current date
+    let minDate = new Date();
+    minDate = this.normalizeDate(minDate);
+
+    while (d >= minDate && !(await this.getTasksAtDate(user, d))) {
+      await this.create(user, d, taskPool as ObjectId[]);
+      d.setDate(d.getDate() - 1);
+    }
   }
 
   async create(user: ObjectId, deadline: Date, tasks: ObjectId[]) {
