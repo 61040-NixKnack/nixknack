@@ -32,6 +32,8 @@ const props = defineProps(["itemID", "itemUrl", "itemName"]);
   max-height: 250px;
   border-radius: 28px;
   padding: 16px;
+
+  cursor: pointer;
 }
 
 .item-image {

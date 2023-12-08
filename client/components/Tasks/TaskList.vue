@@ -3,14 +3,14 @@ import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 // Assuming items to get rid of today are stored in userPlan.value[0]
-const userPlan = ref([["item", "item2"], ["item3"], ["item4", "item5", "item6"], [], ["item7"], [], []]);
+const userPlan = ref([[], [], [], [], [], [], []]);
 const dateName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const offset = new Date().getDay();
 
 onBeforeMount(async () => {
-  // Get user plan from server\
-  console.log(await fetchy("/api/plans", "GET"));
+  // Get user plan from server
+  userPlan.value = await fetchy("/api/plans", "GET");
 });
 </script>
 

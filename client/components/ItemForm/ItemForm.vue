@@ -203,6 +203,7 @@ const checkDeleted = (tag: string) => {
 
 .close-button {
   align-self: flex-start;
+  cursor: pointer;
 }
 
 .current-tags {
