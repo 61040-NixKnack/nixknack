@@ -157,7 +157,9 @@ const checkDeleted = (tag: string) => {
 };
 
 const deleteItem = async () => {
-  await fetchy(`/api/items/${props.itemID}`, "DELETE");
+  await fetchy(`/api/items/${props.itemID}`, "DELETE", {
+    query: { points: false },
+  });
   await router.push({ name: "Catalog" });
 };
 </script>
