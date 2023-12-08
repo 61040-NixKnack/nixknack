@@ -217,7 +217,7 @@ class Routes {
     const userItems = await Item.getItems({ owner: user });
     const itemIDs = userItems.map((item) => item._id);
     const userTags = new Set(await Tag.getTags(itemIDs));
-    return new Set(...userTags, ...Tag.definedTags);
+    return [...userTags, ...Tag.definedTags];
   }
 
   /**
