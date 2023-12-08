@@ -40,6 +40,11 @@ const reloadItem = async () => {
 const goBack = async () => {
   await router.push({ name: "Catalog" });
 };
+
+const discardItem = async () => {
+  await fetchy(`/api/items/${props.itemID}`, "DELETE");
+  await router.push({ name: "Catalog" });
+};
 </script>
 
 <template>
@@ -79,7 +84,7 @@ const goBack = async () => {
     <section id="options">
       <!-- TODO -->
       <button @click="openOverlay = true">Edit</button>
-      <button @click="notImplemented">Discard</button>
+      <button @click="discardItem">Discard</button>
     </section>
   </main>
   <md-circular-progress indeterminate v-else></md-circular-progress>
