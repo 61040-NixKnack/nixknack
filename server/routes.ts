@@ -115,8 +115,8 @@ class Routes {
     return Item.delete({ _id: id });
   }
 
-  @Router.post("/items/:_id/:tags")
-  async addItemToTags(session: WebSessionDoc, tags: string[], _id: ObjectId) {
+  @Router.post("/items/:_id")
+  async addItemToTags(session: WebSessionDoc, _id: ObjectId, tags: string[]) {
     const id = new ObjectId(_id);
     const user = WebSession.getUser(session);
     await Item.isOwner(user, id);
