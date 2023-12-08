@@ -9,8 +9,8 @@ const { loginUser, updateSession } = useUserStore();
 
 async function login() {
   await loginUser(username.value, password.value);
-  void updateSession();
-  void router.push({ name: router.currentRoute.value.redirectedFrom?.name ?? "Catalog" });
+  await updateSession();
+  await router.push({ name: router.currentRoute.value.redirectedFrom?.name ?? "Catalog" });
 }
 </script>
 
