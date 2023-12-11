@@ -15,8 +15,14 @@ export default class PlanConcept {
 
   private choose(choices: ObjectId[], count: number) {
     const res = [];
+    let index = 0;
     for (let i = 0; i < count; i++) {
-      res.push(choices[Math.floor(Math.random() * choices.length)]);
+      if (choices.length === 0) {
+        break;
+      }
+      index = Math.floor(Math.random() * choices.length);
+      res.push(choices[index]);
+      delete choices[index];
     }
     return res;
   }
