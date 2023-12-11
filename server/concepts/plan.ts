@@ -85,7 +85,7 @@ export default class PlanConcept {
       return { msg: "Plan created successfully!", plan: await this.plans.readOne({ _id }) };
     } else {
       plan.tasks.push(selected);
-      await this.plans.updateOne({ user, deadline }, { tasks });
+      await this.plans.updateOne({ user, deadline }, { tasks: plan.tasks });
       return { msg: "Plan updated successfully!", plan: plan };
     }
   }
