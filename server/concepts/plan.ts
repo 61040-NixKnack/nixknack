@@ -61,15 +61,13 @@ export default class PlanConcept {
     // Start 7 days ahead
     let d = new Date();
     d = this.normalizeDate(d);
-    d.setDate(d.getDate() + 6);
 
-    for (let i = 6; i >= 0; i--) {
+    for (let i = 0; i < 7; i++) {
       if ((await this.getTasksAtDate(user, d)).length > 0) {
-        console.log("Exist");
-        break;
+        continue;
       }
       await this.create(user, d, taskPool);
-      d.setDate(d.getDate() - 1);
+      d.setDate(d.getDate() + 1);
     }
   }
 
