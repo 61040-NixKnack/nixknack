@@ -2,9 +2,9 @@
 import router from "@/router";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
+import { onBeforeMount, ref } from "vue";
 import UpdateUserForm from "../components/Setting/UpdateUserForm.vue";
 import { fetchy } from "../utils/fetchy";
-import { onBeforeMount, ref } from "vue";
 
 const { currentUsername } = storeToRefs(useUserStore());
 const { logoutUser, deleteUser } = useUserStore();
@@ -47,13 +47,13 @@ onBeforeMount(async () => {
         </div>
         <div class="achievement secondary-div">
           <p>
-            <b>Item Discarder {{ achievementReady ? achievementData[0]["added"] : 0 }}</b>
+            <b>Items Added {{ achievementReady ? achievementData[0]["added"] : 0 }}</b>
           </p>
           <p>To Next: {{ achievementReady ? achievementData[2]["added"][1] - achievementData[1]["added"] : 0 }}</p>
         </div>
         <div class="achievement secondary-div">
           <p>
-            <b>Item Adder {{ achievementReady ? achievementData[0]["discarded"] : 0 }}</b>
+            <b>Items Discarded {{ achievementReady ? achievementData[0]["discarded"] : 0 }}</b>
           </p>
           <p>To Next: {{ achievementReady ? achievementData[2]["discarded"][1] - achievementData[1]["discarded"] : 0 }}</p>
         </div>
