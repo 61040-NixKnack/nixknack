@@ -129,13 +129,13 @@ class Routes {
     const user = WebSession.getUser(session);
     await Item.isOwner(user, id);
     await Tag.deleteItemFromAll([id]); // Delete item from all tags.
-    await Task.deleteAll({ item: id });
     await Point.addPoints(user, 10);
     await Achievement.updateProgress(user, AchievementName.ItemsDiscarded, 1);
     if (await Task.isTask(user, id)) {
       await Point.addPoints(user, 10);
       await Achievement.updateProgress(user, AchievementName.CompletedTasks, 1);
     }
+    await Task.deleteAll({ item: id });
     return Item.delete({ _id: id });
   }
 
