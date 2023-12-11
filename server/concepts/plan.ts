@@ -16,13 +16,14 @@ export default class PlanConcept {
   private choose(choices: ObjectId[], count: number) {
     const res = [];
     let index = 0;
+
     for (let i = 0; i < count; i++) {
       if (choices.length === 0) {
         break;
       }
       index = Math.floor(Math.random() * choices.length);
       res.push(choices[index]);
-      delete choices[index];
+      choices.splice(index, 1);
     }
     return res;
   }
@@ -61,24 +62,32 @@ export default class PlanConcept {
     // Start 7 days ahead
     let d = new Date();
     d = this.normalizeDate(d);
-    d.setDate(d.getDate() + 6);
 
-    for (let i = 6; i >= 0; i--) {
-      if ((await this.getTasksAtDate(user, d)).length > 0) {
-        console.log("Exist");
-        break;
+    for (let i = 0; i < 7; i++) {
+      const tasksForDay = await this.getTasksAtDate(user, d);
+
+      for (let j = tasksForDay.length; j < TASKS_PER_DAY; j++) {
+        await this.create(user, d, taskPool);
       }
-      await this.create(user, d, taskPool);
-      d.setDate(d.getDate() - 1);
+      d.setDate(d.getDate() + 1);
     }
   }
 
   async create(user: ObjectId, deadline: Date, tasks: ObjectId[]) {
-    await this.alreadyHasPlan(user, deadline);
+    await this.planIsNotFull(user, deadline);
 
-    const selected: ObjectId[] = this.choose(tasks, TASKS_PER_DAY);
-    const _id = await this.plans.createOne({ user, deadline, tasks: selected });
-    return { msg: "Plan created successfully!", plan: await this.plans.readOne({ _id }) };
+    const selected: ObjectId = this.choose(tasks, 1)[0];
+
+    const plan = await this.plans.readOne({ user, deadline });
+
+    if (!plan) {
+      const _id = await this.plans.createOne({ user, deadline, tasks: [selected] });
+      return { msg: "Plan created successfully!", plan: await this.plans.readOne({ _id }) };
+    } else {
+      plan.tasks.push(selected);
+      await this.plans.updateOne({ user, deadline }, { tasks });
+      return { msg: "Plan updated successfully!", plan: plan };
+    }
   }
 
   async expireTask(user: ObjectId) {
@@ -95,9 +104,9 @@ export default class PlanConcept {
     return { msg: "Plans deleted!" };
   }
 
-  private async alreadyHasPlan(user: ObjectId, deadline: Date) {
+  private async planIsNotFull(user: ObjectId, deadline: Date) {
     const plan = await this.plans.readOne({ user, deadline });
-    if (plan !== null) {
+    if (plan && plan.tasks.length > 2) {
       throw new AlreadyCreatedPlanError(user, deadline);
     }
   }
@@ -108,6 +117,6 @@ export class AlreadyCreatedPlanError extends NotAllowedError {
     public readonly user: ObjectId,
     public readonly deadline: Date,
   ) {
-    super("{0} already has a plan for date {1}!", user, deadline);
+    super("{0} already has a full plan for date {1}!", user, deadline);
   }
 }
