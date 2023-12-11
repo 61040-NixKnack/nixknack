@@ -78,8 +78,15 @@ export default class AchievementConcept {
       throw new NotFoundError(`Achievement with name ${name} does not exist`);
     }
 
-    const level = this.findMaxAchievementLevel(progress, achievementObj.thresholds);
-    await this.user_achieves.updateOne({ user, name }, { progress, level }, { upsert: true });
+    const currAchieve = await this.user_achieves.readOne({ user, name });
+    const newProgress = (currAchieve?.progress ?? 0) + progress;
+    const level = this.findMaxAchievementLevel(newProgress, achievementObj.thresholds);
+
+    if (!currAchieve) {
+      await this.user_achieves.createOne({ user, name, progress: newProgress, level });
+    } else {
+      await this.user_achieves.updateOne({ user, name }, { progress: newProgress, level });
+    }
 
     return { msg: `Updated progress of achievement ${name} to level ${level} with progress ${progress}` };
   }
