@@ -98,6 +98,8 @@ class Routes {
   async createItem(session: WebSessionDoc, name: string, lastUsedDate?: Date, location?: string, purpose?: string, image?: string) {
     const user = WebSession.getUser(session);
     const created = await Item.create(user, name, lastUsedDate, location, purpose, image);
+    await Achievement.updateProgress(user, AchievementName.ItemsAdded, 1);
+    await Point.addPoints(user, 5);
     return { msg: created.msg, id: created.id };
   }
 
