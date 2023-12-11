@@ -23,7 +23,7 @@ export default class PlanConcept {
       }
       index = Math.floor(Math.random() * choices.length);
       res.push(choices[index]);
-      delete choices[index];
+      choices.splice(index, 1);
     }
     return res;
   }
