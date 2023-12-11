@@ -29,6 +29,14 @@ export default class TaskConcept {
     }
   }
 
+  async isTask(user: ObjectId, _id: ObjectId) {
+    const maybeTask = await this.tasks.readOne({ item: _id, assignee: user });
+    if (maybeTask === null) {
+      return false;
+    }
+    return true;
+  }
+
   async getArrayTasks(ids: ObjectId[][]) {
     const tasks = new Array<Promise<TaskDoc[]>>();
     for (const id of ids) {
