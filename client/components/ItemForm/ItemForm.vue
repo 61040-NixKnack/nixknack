@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { storage } from "@/utils/firebase.js";
 import router from "@/router/index";
+import { storage } from "@/utils/firebase.js";
 import "@material/web/button/filled-button.js";
-import "@material/web/textfield/outlined-text-field.js";
 import "@material/web/chips/chip-set.js";
 import "@material/web/chips/filter-chip.js";
 import "@material/web/select/outlined-select.js";
 import "@material/web/select/select-option.js";
-import { ref as fref, uploadBytes, getDownloadURL } from "firebase/storage";
+import "@material/web/textfield/outlined-text-field.js";
+import { ref as fref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
-import { computed, ref, onBeforeMount } from "vue";
+import { computed, onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 import { formatDateShort } from "../../utils/formatDate";
 
@@ -157,9 +157,7 @@ const checkDeleted = (tag: string) => {
 };
 
 const deleteItem = async () => {
-  await fetchy(`/api/items/${props.itemID}`, "DELETE", {
-    query: { points: false },
-  });
+  await fetchy(`/api/items/${props.itemID}`, "DELETE");
   await router.push({ name: "Catalog" });
 };
 </script>

@@ -3,7 +3,7 @@ import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotAllowedError } from "./errors";
 
 export interface TaskDoc extends BaseDoc {
-  objective: ObjectId;
+  objective: string;
   assignee: ObjectId;
   item: ObjectId;
 }
@@ -11,7 +11,7 @@ export interface TaskDoc extends BaseDoc {
 export default class TaskConcept {
   public readonly tasks = new DocCollection<TaskDoc>("tasks");
 
-  async assign(user: ObjectId, rec: ObjectId, item: ObjectId) {
+  async assign(user: ObjectId, rec: string, item: ObjectId) {
     await this.uniqueTask(user, rec, item);
     const _id = await this.tasks.createOne({ objective: rec, assignee: user, item: item });
     return { msg: `Task for user ${user} and item ${item} with rec ${rec} successfully created`, _id: _id };
@@ -27,6 +27,14 @@ export default class TaskConcept {
     if (maybeTask === null) {
       throw new NotAllowedError(`Task ${_id} is not assigned for user ${user}`);
     }
+  }
+
+  async isTask(user: ObjectId, _id: ObjectId) {
+    const maybeTask = await this.tasks.readOne({ item: _id, assignee: user });
+    if (maybeTask === null) {
+      return false;
+    }
+    return true;
   }
 
   async getArrayTasks(ids: ObjectId[][]) {
@@ -55,7 +63,7 @@ export default class TaskConcept {
     return { msg: `All tasks with query ${query} deleted!` };
   }
 
-  private async uniqueTask(user: ObjectId, rec: ObjectId, item: ObjectId) {
+  private async uniqueTask(user: ObjectId, rec: string, item: ObjectId) {
     const maybeTask = await this.tasks.readOne({ objective: rec, assignee: user, item: item });
     if (maybeTask !== null) {
       throw new NotAllowedError(`Task for user ${user}, rec ${rec}, and item ${item} already exists!`);

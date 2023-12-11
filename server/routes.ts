@@ -98,6 +98,9 @@ class Routes {
   async createItem(session: WebSessionDoc, name: string, lastUsedDate?: Date, location?: string, purpose?: string, image?: string) {
     const user = WebSession.getUser(session);
     const created = await Item.create(user, name, lastUsedDate, location, purpose, image);
+    await Achievement.updateProgress(user, AchievementName.ItemsAdded, 1);
+    await Point.addPoints(user, 5);
+    await Achievement.updateProgress(user, AchievementName.Experience, 5);
     return { msg: created.msg, id: created.id };
   }
 
@@ -105,21 +108,37 @@ class Routes {
   async updateItem(session: WebSessionDoc, _id: ObjectId, update: Partial<ItemDoc>) {
     const id = new ObjectId(_id);
     const user = WebSession.getUser(session);
+    console.log("Update Item");
+    console.log(id);
     await Item.isOwner(user, id);
     return await Item.update(id, update);
   }
 
   @Router.delete("/items/:_id")
-  async deleteItem(session: WebSessionDoc, _id: ObjectId, points: boolean) {
+  async deleteItem(session: WebSessionDoc, _id: ObjectId) {
     const id = new ObjectId(_id);
     const user = WebSession.getUser(session);
     await Item.isOwner(user, id);
     await Tag.deleteItemFromAll([id]); // Delete item from all tags.
     await Task.deleteAll({ item: id });
-    if (points) {
+    return Item.delete({ _id: id });
+  }
+
+  @Router.delete("/items/:_id/points")
+  async discardItem(session: WebSessionDoc, _id: ObjectId) {
+    const id = new ObjectId(_id);
+    const user = WebSession.getUser(session);
+    await Item.isOwner(user, id);
+    await Tag.deleteItemFromAll([id]); // Delete item from all tags.
+    await Point.addPoints(user, 10);
+    await Achievement.updateProgress(user, AchievementName.Experience, 10);
+    await Achievement.updateProgress(user, AchievementName.ItemsDiscarded, 1);
+    if (await Task.isTask(user, id)) {
       await Point.addPoints(user, 10);
-      await Achievement.updateProgress(user, AchievementName.ItemsDiscarded, 1);
+      await Achievement.updateProgress(user, AchievementName.Experience, 10);
+      await Achievement.updateProgress(user, AchievementName.CompletedTasks, 1);
     }
+    await Task.deleteAll({ item: id });
     return Item.delete({ _id: id });
   }
 
@@ -177,6 +196,7 @@ class Routes {
     await Tag.deleteItemFromAll([id]);
     await Item.delete({ _id: id });
     await Point.addPoints(user, 10);
+    await Achievement.updateProgress(user, AchievementName.Experience, 10);
     await Achievement.updateProgress(user, AchievementName.CompletedTasks, 1);
     await Achievement.updateProgress(user, AchievementName.ItemsDiscarded, 1);
     return { msg: "Success" };
@@ -186,28 +206,32 @@ class Routes {
   async generatePlan(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     const items = (await Item.getItems({ owner: user })).map((item) => item._id);
+    console.log(items);
     const userTags = await Tag.getTags(items);
     const itemsByTag = await Tag.itemsByTag(userTags, items);
-
     const taskPool: ObjectId[] = [];
-
+    console.log(itemsByTag);
     for (const [tag, itm] of itemsByTag) {
       // Pass tags into Recommendation in bulk and mapping for tag and recId
-      const recId = (await Recommendation.getRecommendation(tag))._id;
+      const rec = (await Recommendation.getRecommendation(tag)).text;
       // Add this to Tag
       if (itm.length > ((await Tag.getTagTN(tag)) ?? 0)) {
         // Add this into Task and have it return taskPool
         for (const i of itm) {
-          const maybeTask = await Task.getTasks({ user, rec: recId, item: i }, true);
-          if (maybeTask) {
+          console.log(i);
+          const maybeTask = await Task.getTasks({ assignee: user, objective: rec, item: i }, true);
+          console.log(maybeTask);
+          if (maybeTask.length !== 0) {
+            console.log("Already");
             taskPool.push(maybeTask[0] as ObjectId);
+            console.log(taskPool);
           } else {
-            taskPool.push((await Task.assign(user, recId, i))._id);
+            console.log("assign");
+            taskPool.push((await Task.assign(user, rec, i))._id);
           }
         }
       }
     }
-
     await Plan.populateWeekTasks(user, taskPool);
     return { msg: "Success" };
   }
@@ -217,7 +241,22 @@ class Routes {
     const user = WebSession.getUser(session);
     const taskIds = await Plan.getWeekTasks(user);
     const plan = await Task.getArrayTasks(taskIds);
-    return plan;
+    console.log(plan);
+    const readable = [];
+    for (const date of plan) {
+      const tasks = [];
+      for (const task of date) {
+        let name = (await Item.getItem(task.item))?.name;
+        if (name === undefined) {
+          name = "";
+        }
+        tasks.push([task.objective, task.assignee, name]);
+      }
+      readable.push(tasks);
+    }
+    console.log("get");
+    console.log(readable);
+    return readable;
   }
 
   @Router.get("/tags")
