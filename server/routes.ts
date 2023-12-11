@@ -100,6 +100,7 @@ class Routes {
     const created = await Item.create(user, name, lastUsedDate, location, purpose, image);
     await Achievement.updateProgress(user, AchievementName.ItemsAdded, 1);
     await Point.addPoints(user, 5);
+    await Achievement.updateProgress(user, AchievementName.Experience, 5);
     return { msg: created.msg, id: created.id };
   }
 
@@ -130,9 +131,11 @@ class Routes {
     await Item.isOwner(user, id);
     await Tag.deleteItemFromAll([id]); // Delete item from all tags.
     await Point.addPoints(user, 10);
+    await Achievement.updateProgress(user, AchievementName.Experience, 10);
     await Achievement.updateProgress(user, AchievementName.ItemsDiscarded, 1);
     if (await Task.isTask(user, id)) {
       await Point.addPoints(user, 10);
+      await Achievement.updateProgress(user, AchievementName.Experience, 10);
       await Achievement.updateProgress(user, AchievementName.CompletedTasks, 1);
     }
     await Task.deleteAll({ item: id });
@@ -193,6 +196,7 @@ class Routes {
     await Tag.deleteItemFromAll([id]);
     await Item.delete({ _id: id });
     await Point.addPoints(user, 10);
+    await Achievement.updateProgress(user, AchievementName.Experience, 10);
     await Achievement.updateProgress(user, AchievementName.CompletedTasks, 1);
     await Achievement.updateProgress(user, AchievementName.ItemsDiscarded, 1);
     return { msg: "Success" };

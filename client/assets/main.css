@@ -10,6 +10,7 @@
 
   --md-sys-color-primary: var(--secondary);
   --md-sys-color-secondary-container: var(--dark-accent);
+  --md-menu-container-color: var(--light-accent);
   
   background-color: var(--primary);
 }
