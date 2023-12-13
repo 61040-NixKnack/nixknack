@@ -90,6 +90,9 @@ onBeforeMount(async () => {
 <style scoped>
 main {
   --md-sys-color-primary: var(--dark-accent);
+  --md-linear-progress-track-height: 8px;
+  --md-linear-progress-track-shape: 8px;
+  --md-linear-progress-active-indicator-height: 8px;
 }
 
 #profile-main {
