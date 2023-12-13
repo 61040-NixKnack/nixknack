@@ -105,7 +105,8 @@ class Routes {
   }
 
   @Router.patch("/items/:_id")
-  async updateItem(session: WebSessionDoc, _id: ObjectId, update: Partial<ItemDoc>) {
+  async updateItem(session: WebSessionDoc, _id: ObjectId, name: string, lastUsedDate?: Date, location?: string, purpose?: string, image?: string) {
+    const update = { name, lastUsedDate, location, purpose, image };
     const id = new ObjectId(_id);
     const user = WebSession.getUser(session);
     console.log("Update Item");
