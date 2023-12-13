@@ -70,7 +70,7 @@ export default class TagConcept {
 
   async deleteItem(tag: string, itemId: ObjectId) {
     await this.itemAdded(tag, itemId);
-    await this.tags.updateArrayOne({ value: tag }, { $pull: { $taggedItems: { $in: itemId } } });
+    await this.tags.updateArrayOne({ value: tag }, { $pull: { taggedItems: itemId } });
     return { msg: `Item ${itemId} deleted for tag ${tag}!` };
   }
 
