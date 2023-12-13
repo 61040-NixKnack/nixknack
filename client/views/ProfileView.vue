@@ -5,6 +5,8 @@ import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import UpdateUserForm from "../components/Setting/UpdateUserForm.vue";
 import { fetchy } from "../utils/fetchy";
+import "@material/web/progress/circular-progress.js";
+import "@material/web/progress/linear-progress.js";
 
 const { currentUsername } = storeToRefs(useUserStore());
 const { logoutUser, deleteUser } = useUserStore();
@@ -31,7 +33,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <main class="column" id="profile-main">
+  <main class="column" id="profile-main" v-if="achievementReady">
     <section>
       <h2>{{ currentUsername }}'s Profile</h2>
       <h3>Total Exp: {{ points }}</h3>
@@ -41,27 +43,33 @@ onBeforeMount(async () => {
       <div id="all-achievements">
         <div class="achievement secondary-div">
           <p>
-            <b>Level {{ achievementReady ? achievementData[0]["exp"] : 0 }}</b>
+            <b>Level {{ achievementData[0]["exp"] }}</b>
           </p>
-          <p>To next: {{ achievementReady ? achievementData[2]["exp"][1] - achievementData[1]["exp"] : 0 }}</p>
+          <p>To next: {{ achievementData[2]["exp"][1] - achievementData[1]["exp"] }}</p>
+          <md-linear-progress :value="(achievementData[1]['exp'] - achievementData[2]['exp'][0]) / (achievementData[2]['exp'][1] - achievementData[2]['exp'][0])"></md-linear-progress>
         </div>
         <div class="achievement secondary-div">
           <p>
-            <b>Items Added {{ achievementReady ? achievementData[0]["added"] : 0 }}</b>
+            <b>Items Added {{ achievementData[0]["added"] }}</b>
           </p>
-          <p>To Next: {{ achievementReady ? achievementData[2]["added"][1] - achievementData[1]["added"] : 0 }}</p>
+          <p>To Next: {{ achievementData[2]["added"][1] - achievementData[1]["added"] }}</p>
+          <md-linear-progress :value="(achievementData[1]['added'] - achievementData[2]['added'][0]) / (achievementData[2]['added'][1] - achievementData[2]['added'][0])"></md-linear-progress>
         </div>
         <div class="achievement secondary-div">
           <p>
-            <b>Items Discarded {{ achievementReady ? achievementData[0]["discarded"] : 0 }}</b>
+            <b>Items Discarded {{ achievementData[0]["discarded"] }}</b>
           </p>
-          <p>To Next: {{ achievementReady ? achievementData[2]["discarded"][1] - achievementData[1]["discarded"] : 0 }}</p>
+          <p>To Next: {{ achievementData[2]["discarded"][1] - achievementData[1]["discarded"] }}</p>
+          <md-linear-progress
+            :value="(achievementData[1]['discarded'] - achievementData[2]['discarded'][0]) / (achievementData[2]['discarded'][1] - achievementData[2]['discarded'][0])"
+          ></md-linear-progress>
         </div>
         <div class="achievement secondary-div">
           <p>
-            <b>Task Completer {{ achievementReady ? achievementData[0]["tasks"] : 0 }}</b>
+            <b>Task Completer {{ achievementData[0]["tasks"] }}</b>
           </p>
-          <p>To Next: {{ achievementReady ? achievementData[2]["tasks"][1] - achievementData[1]["tasks"] : 0 }}</p>
+          <p>To Next: {{ achievementData[2]["tasks"][1] - achievementData[1]["tasks"] }}</p>
+          <md-linear-progress :value="(achievementData[1]['tasks'] - achievementData[2]['tasks'][0]) / (achievementData[2]['tasks'][1] - achievementData[2]['tasks'][0])"></md-linear-progress>
         </div>
       </div>
     </section>
@@ -74,9 +82,16 @@ onBeforeMount(async () => {
       </div>
     </section>
   </main>
+  <div v-else>
+    <md-circular-progress indeterminate></md-circular-progress>
+  </div>
 </template>
 
 <style scoped>
+main {
+  --md-sys-color-primary: var(--dark-accent);
+}
+
 #profile-main {
   margin-bottom: 88px;
 }
@@ -128,5 +143,11 @@ h3 {
   display: flex;
   flex-direction: row;
   gap: 10px;
+}
+
+md-circular-progress {
+  position: fixed;
+  top: 50%;
+  left: 50%;
 }
 </style>
