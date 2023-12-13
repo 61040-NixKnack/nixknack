@@ -8,7 +8,8 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: (tag) => ["md-circular-progress", "md-outlined-text-field", "md-filled-button", "md-select-option", "md-outlined-select", "md-filter-chip", "md-chip-set"].includes(tag),
+          isCustomElement: (tag) =>
+            ["md-circular-progress", "md-outlined-text-field", "md-filled-button", "md-select-option", "md-outlined-select", "md-filter-chip", "md-chip-set", "md-linear-progress"].includes(tag),
         },
       },
     }),
