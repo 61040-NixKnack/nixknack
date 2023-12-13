@@ -16,14 +16,18 @@ const itemTags = ref([]);
 const imageURL = ref("");
 const openOverlay = ref(false);
 
+const reloadItem = async () => {
+  const itemDoc = await fetchy(`/api/items/${props.itemID}`, "GET");
+  itemName.value = itemDoc.name;
+  itemDesc.value = itemDoc.purpose;
+  lastUsed.value = formatDateShort(new Date(itemDoc.lastUsedDate));
+  if (itemDoc.image) imageURL.value = await getDownloadURL(fref(storage, itemDoc.image));
+  itemTags.value = await fetchy(`/api/items/${props.itemID}/tags`, "GET");
+};
+
 onBeforeMount(async () => {
   try {
-    const itemDoc = await fetchy(`/api/items/${props.itemID}`, "GET");
-    itemName.value = itemDoc.name;
-    itemDesc.value = itemDoc.purpose;
-    lastUsed.value = formatDateShort(new Date(itemDoc.lastUsedDate));
-    if (itemDoc.image) imageURL.value = await getDownloadURL(fref(storage, itemDoc.image));
-    itemTags.value = await fetchy(`/api/items/${props.itemID}/tags`, "GET");
+    await reloadItem();
   } catch (error) {
     await router.push({ name: "not-found-page" });
   }
@@ -31,10 +35,6 @@ onBeforeMount(async () => {
 
 const notImplemented = async () => {
   useToastStore().showToast({ message: "NOT IMPLEMENTED", style: "error" });
-};
-
-const reloadItem = async () => {
-  // TODO
 };
 
 const goBack = async () => {
