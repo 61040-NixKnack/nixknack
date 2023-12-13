@@ -72,8 +72,6 @@ const updateItem = async (name: string, lastUsedDate: string, location: string, 
   const newTags = chosenTags.value.filter((tag) => !originalTags.value.includes(tag));
   const oldTags = originalTags.value.filter((tag) => !chosenTags.value.includes(tag));
 
-  console.log(newTags, oldTags);
-
   if (itemPicFile.value) {
     imgName = itemPicFile.value.name + v4();
     const imageRef = fref(storage, imgName);
@@ -87,10 +85,10 @@ const updateItem = async (name: string, lastUsedDate: string, location: string, 
 
     // console.log("waiting");
 
-    for (const tag in oldTags) void fetchy(`/items/${props.itemID}/${tag}`, "DELETE");
+    oldTags.forEach((tag) => void fetchy(`/api/items/${props.itemID}/${tag}`, "DELETE"));
 
-    if (newTags)
-      await fetchy(`/items/${props.itemID}`, "POST", {
+    if (newTags.length > 0)
+      await fetchy(`/api/items/${props.itemID}`, "POST", {
         body: { tags: newTags },
       });
 
@@ -134,7 +132,7 @@ onBeforeMount(async () => {
   if (isEditing.value) {
     const itemDoc = await fetchy(`/api/items/${props.itemID}`, "GET");
     originalTags.value = await fetchy(`/api/items/${props.itemID}/tags`, "GET");
-    chosenTags.value = originalTags.value;
+    chosenTags.value = originalTags.value.slice();
 
     // console.log(itemDoc);
     name.value = itemDoc.name;
