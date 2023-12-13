@@ -109,8 +109,6 @@ class Routes {
     const update = { name, lastUsedDate, location, purpose, image };
     const id = new ObjectId(_id);
     const user = WebSession.getUser(session);
-    console.log("Update Item");
-    console.log(id);
     await Item.isOwner(user, id);
     return await Item.update(id, update);
   }
@@ -207,11 +205,11 @@ class Routes {
   async generatePlan(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     const items = (await Item.getItems({ owner: user })).map((item) => item._id);
-    console.log(items);
+    // console.log(items);
     const userTags = await Tag.getTags(items);
     const itemsByTag = await Tag.itemsByTag(userTags, items);
     const taskPool: ObjectId[] = [];
-    console.log(itemsByTag);
+    // console.log(itemsByTag);
     for (const [tag, itm] of itemsByTag) {
       // Pass tags into Recommendation in bulk and mapping for tag and recId
       const rec = (await Recommendation.getRecommendation(tag)).text;
@@ -219,15 +217,15 @@ class Routes {
       if (itm.length > ((await Tag.getTagTN(tag)) ?? 0)) {
         // Add this into Task and have it return taskPool
         for (const i of itm) {
-          console.log(i);
+          // console.log(i);
           const maybeTask = await Task.getTasks({ assignee: user, objective: rec, item: i }, true);
-          console.log(maybeTask);
+          // console.log(maybeTask);
           if (maybeTask.length !== 0) {
-            console.log("Already");
+            // console.log("Already");
             taskPool.push(maybeTask[0] as ObjectId);
-            console.log(taskPool);
+            // console.log(taskPool);
           } else {
-            console.log("assign");
+            // console.log("assign");
             taskPool.push((await Task.assign(user, rec, i))._id);
           }
         }
@@ -242,7 +240,7 @@ class Routes {
     const user = WebSession.getUser(session);
     const taskIds = await Plan.getWeekTasks(user);
     const plan = await Task.getArrayTasks(taskIds);
-    console.log(plan);
+    // console.log(plan);
     const readable = [];
     for (const date of plan) {
       const tasks = [];
@@ -255,8 +253,8 @@ class Routes {
       }
       readable.push(tasks);
     }
-    console.log("get");
-    console.log(readable);
+    // console.log("get");
+    // console.log(readable);
     return readable;
   }
 
