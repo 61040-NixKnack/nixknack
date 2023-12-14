@@ -25,6 +25,7 @@ const chosenTags = ref<string[]>([]);
 const originalTags = ref<string[]>([]);
 const itemPicFile = ref();
 const originalImgURL = ref("");
+const originalImgName = ref("");
 const itemPicURL = computed(() => (itemPicFile.value ? URL.createObjectURL(itemPicFile.value) : originalImgURL.value));
 
 const emit = defineEmits(["closeSheet"]);
@@ -80,7 +81,7 @@ const updateItem = async (name: string, lastUsedDate: string, location: string, 
 
   try {
     const DB_Promise = fetchy(`/api/items/${props.itemID}`, "PATCH", {
-      body: FB_Promise ? { name, lastUsedDate, location, purpose, image: imgName } : { name, lastUsedDate, location, purpose },
+      body: FB_Promise ? { name, lastUsedDate, location, purpose, image: imgName } : { name, lastUsedDate, location, purpose, image: originalImgName.value },
     });
 
     // console.log("waiting");
@@ -140,6 +141,8 @@ onBeforeMount(async () => {
     location.value = itemDoc.location;
     lastUsedDate.value = formatDateShort(new Date(itemDoc.lastUsedDate));
     originalImgURL.value = itemDoc.image ? await loadFirebase(itemDoc.image) : "";
+
+    originalImgName.value = itemDoc.image ? itemDoc.image : "";
   }
 });
 
